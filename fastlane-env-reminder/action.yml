@@ -1,5 +1,5 @@
-name: 'Fastlane env'
-description: 'An action for adding a comment to include `fastlane env`'
+name: 'Fastlane env reminder'
+description: 'An action for adding a comment to include `fastlane env` in an issue description'
 author: 'fastlane'
 inputs:
   repo-token:

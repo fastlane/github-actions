@@ -8,7 +8,7 @@ See [action.yml](action.yml)
 
 ```yaml
 steps:
-- uses: ./.github/actions/add-fastlane-env-comment
+- uses: fastlane/github-action/fastlane-env-reminder@latest
   with:
     repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```

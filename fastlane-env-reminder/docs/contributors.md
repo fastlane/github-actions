@@ -4,7 +4,7 @@
 
 - Do checkin source (src)
 - Do checkin build output (lib)
-- Do checkin runtime node_modules
+- Do not checkin runtime node_modules in development workflow (see [Dev Workflow documentation](https://github.com/actions/toolkit/blob/master/docs/javascript-action.md#dev-workflow))
 - Do not checkin devDependency node_modules (husky can help see below)
 
 ### devDependencies
