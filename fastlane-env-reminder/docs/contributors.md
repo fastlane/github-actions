@@ -1,5 +1,12 @@
 # Contributors
 
+### Build and Test
+
+```bash
+$ npm run build
+$ npm test
+```
+
 ### Checkin
 
 - Do checkin source (src)
