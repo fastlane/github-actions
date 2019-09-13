@@ -7,14 +7,14 @@ $ npm run build
 $ npm test
 ```
 
-### Checkin
+### Check in
 
-- Do checkin source (src)
-- Do checkin build output (lib)
-- Do not checkin runtime node_modules in development workflow (see [Dev Workflow documentation](https://github.com/actions/toolkit/blob/master/docs/javascript-action.md#dev-workflow))
-- Do not checkin devDependency node_modules (husky can help see below)
+- Do check in source (`src`)
+- Do check in build output (`lib`)
+- Do not check in runtime `node_modules` in development workflow (see [Dev Workflow documentation](https://github.com/actions/toolkit/blob/master/docs/javascript-action.md#dev-workflow))
+- Do not check in devDependency `node_modules` (husky can help, see below)
 
-### devDependencies
+### `devDependencies`
 
 In order to handle correctly checking in node_modules without devDependencies, we run [Husky](https://github.com/typicode/husky) before each commit.
 This step ensures that formatting and checkin rules are followed and that devDependencies are excluded. To make sure Husky runs correctly, please use the following workflow:
