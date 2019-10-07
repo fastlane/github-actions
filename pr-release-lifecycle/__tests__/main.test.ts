@@ -17,8 +17,8 @@ describe('action test suite', () => {
   for (const scenario of validScenarios) {
     it(`It posts a comment on a merged issue for (${scenario.response})`, async () => { 
       process.env['INPUT_REPO-TOKEN'] = 'token';
-      process.env['INPUT_MERGE-MESSAGE'] = 'message';
-      process.env['INPUT_MERGE-LABEL'] = 'label';
+      process.env['INPUT_PR-COMMENT'] = 'message';
+      process.env['INPUT_PR-LABEL'] = 'label';
 
       process.env['GITHUB_REPOSITORY'] = 'foo/bar';
       process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, scenario.response);
@@ -42,8 +42,8 @@ describe('action test suite', () => {
   for (const scenario of invalidScenarios) {
     it(`It does not post a comment on a closed pull request for (${scenario.response})`, async () => {
         process.env['INPUT_REPO-TOKEN'] = 'token';
-        process.env['INPUT_MERGE-MESSAGE'] = 'message';
-        process.env['INPUT_MERGE-LABEL'] = 'label';
+        process.env['INPUT_PR-COMMENT'] = 'message';
+        process.env['INPUT_PR-LABEL'] = 'label';
   
         process.env['GITHUB_REPOSITORY'] = 'foo/bar';
         process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, scenario.response);
@@ -66,8 +66,8 @@ describe('action test suite', () => {
 
   it(`It does not post a comment on a closed pull request when it is not merged`, async () => {
     process.env['INPUT_REPO-TOKEN'] = 'token';
-    process.env['INPUT_MERGE-MESSAGE'] = 'message';
-    process.env['INPUT_MERGE-LABEL'] = 'label';
+    process.env['INPUT_PR-COMMENT'] = 'message';
+    process.env['INPUT_PR-LABEL'] = 'label';
 
     process.env['GITHUB_REPOSITORY'] = 'foo/bar';
     process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, validScenarios[0].response);

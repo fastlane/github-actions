@@ -3,22 +3,20 @@ import * as github from '@actions/github';
 
 export async function run() {
   try {
-    const context = github.context;
-
-    const isPullRequest: boolean = !!context.payload.pull_request
+    const isPullRequest: boolean = !!github.context.payload.pull_request
     if (!isPullRequest) {
       console.log('The event that triggered this action was not a pull request, exiting');
       return;
     }
 
-    if (context.payload.action !== 'closed') {
+    if (github.context.payload.action !== 'closed') {
       console.log('No pull request was closed, exiting');
       return;
     }
 
     const repoToken = core.getInput('repo-token', {required: true});
     const client: github.GitHub = new github.GitHub(repoToken);
-    const prNumber = context.payload.pull_request!.number
+    const prNumber = github.context.payload.pull_request!.number
 
     const merged = await isMerged(client, prNumber);
     if (!merged) {
@@ -26,11 +24,8 @@ export async function run() {
       return;
     } 
 
-    const labels = [core.getInput('merge-label')];
-    await addLabels(client, prNumber, labels);
-
-    const message = core.getInput('merge-message');
-    await addComment(client, prNumber, message);
+    await addLabels(client, prNumber, [core.getInput('pr-label')]);
+    await addComment(client, prNumber, core.getInput('pr-comment'));
   } catch (error) {
     core.setFailed(error.message);
   }

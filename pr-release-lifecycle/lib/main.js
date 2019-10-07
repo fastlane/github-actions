@@ -20,28 +20,25 @@ const github = __importStar(require("@actions/github"));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const context = github.context;
-            const isPullRequest = !!context.payload.pull_request;
+            const isPullRequest = !!github.context.payload.pull_request;
             if (!isPullRequest) {
                 console.log('The event that triggered this action was not a pull request, exiting');
                 return;
             }
-            if (context.payload.action !== 'closed') {
+            if (github.context.payload.action !== 'closed') {
                 console.log('No pull request was closed, exiting');
                 return;
             }
             const repoToken = core.getInput('repo-token', { required: true });
             const client = new github.GitHub(repoToken);
-            const prNumber = context.payload.pull_request.number;
+            const prNumber = github.context.payload.pull_request.number;
             const merged = yield isMerged(client, prNumber);
             if (!merged) {
                 console.log('No pull request was merged, exiting');
                 return;
             }
-            const labels = [core.getInput('merge-label')];
-            yield addLabels(client, prNumber, labels);
-            const message = core.getInput('merge-message');
-            yield addComment(client, prNumber, message);
+            yield addLabels(client, prNumber, [core.getInput('pr-label')]);
+            yield addComment(client, prNumber, core.getInput('pr-comment'));
         }
         catch (error) {
             core.setFailed(error.message);
