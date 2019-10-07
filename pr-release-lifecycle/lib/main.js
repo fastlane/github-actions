@@ -30,27 +30,18 @@ function run() {
                 console.log('No pull request was closed, exiting');
                 return;
             }
-            const pull_request = context.payload.pull_request;
             const repoToken = core.getInput('repo-token', { required: true });
             const client = new github.GitHub(repoToken);
-            const repo = context.repo;
-            const response = yield client.pulls.checkIfMerged({
-                owner: repo.owner,
-                repo: repo.repo,
-                pull_number: pull_request.number
-            });
-            if (response.status != 204) {
+            const prNumber = context.payload.pull_request.number;
+            const merged = yield isMerged(client, prNumber);
+            if (!merged) {
                 console.log('No pull request was merged, exiting');
                 return;
             }
+            const labels = [core.getInput('merge-label')];
+            yield addLabels(client, prNumber, labels);
             const message = core.getInput('merge-message');
-            yield client.pulls.createReview({
-                owner: repo.owner,
-                repo: repo.repo,
-                pull_number: pull_request.number,
-                body: message,
-                event: 'COMMENT'
-            });
+            yield addComment(client, prNumber, message);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -58,4 +49,35 @@ function run() {
     });
 }
 exports.run = run;
+function isMerged(client, prNumber) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield client.pulls.checkIfMerged({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            pull_number: prNumber
+        });
+        return response.status == 204;
+    });
+}
+function addComment(client, prNumber, comment) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield client.pulls.createReview({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            pull_number: prNumber,
+            body: comment,
+            event: 'COMMENT'
+        });
+    });
+}
+function addLabels(client, prNumber, labels) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield client.issues.addLabels({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            issue_number: prNumber,
+            labels: labels
+        });
+    });
+}
 run();

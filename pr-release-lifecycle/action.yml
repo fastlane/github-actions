@@ -6,12 +6,15 @@ inputs:
     description: 'Token for the repo. Can be passed in using {{ secrets.GITHUB_TOKEN }}'
     required: true
   merge-message:
-    description: 'A comment to post on a pull request when code changes were merged'
+    description: 'A comment to post on a pull request when code changes are merged'
     default: "Thank you for your contribution to _fastlane_ and congrats on getting this pull request merged :tada:\n
               The code change now lives in the `master` branch, however it wasn't released to [RubyGems](https://rubygems.org/gems/fastlane) yet.\n
               We usually ship about once a week, and your PR will be included in the next one.\n\n
               Please let us know if this change requires an immediate release by adding a comment here :+1:\n
               We'll notify you once we shipped a new release with your changes :rocket:"
+  merge-label:
+    description: 'The label to apply when a pull request is merged'
+    default: 'status: included-in-next-release'
 runs:
   using: 'node12'
   main: 'lib/main.js'

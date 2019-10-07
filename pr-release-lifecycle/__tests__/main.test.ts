@@ -15,11 +15,10 @@ const invalidScenarios = [{
 
 describe('action test suite', () => {
   for (const scenario of validScenarios) {
-    it(`It posts a comment on a merged issue for (${scenario.response})`, async () => {
-      const issueMergeMessage = 'message';
-      const repoToken = 'token';
-      process.env['INPUT_MERGE-MESSAGE'] = issueMergeMessage;
-      process.env['INPUT_REPO-TOKEN'] = repoToken;
+    it(`It posts a comment on a merged issue for (${scenario.response})`, async () => { 
+      process.env['INPUT_REPO-TOKEN'] = 'token';
+      process.env['INPUT_MERGE-MESSAGE'] = 'message';
+      process.env['INPUT_MERGE-LABEL'] = 'label';
 
       process.env['GITHUB_REPOSITORY'] = 'foo/bar';
       process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, scenario.response);
@@ -29,6 +28,8 @@ describe('action test suite', () => {
         .get('/repos/foo/bar/pulls/10/merge')
         .reply(204)
         .post('/repos/foo/bar/pulls/10/reviews', '{\"body\":\"message\",\"event\":\"COMMENT\"}')
+        .reply(200)
+        .post('/repos/foo/bar/issues/10/labels', '{\"labels\":[\"label\"]}')
         .reply(200);
 
       const main = require('../src/main');
@@ -40,10 +41,9 @@ describe('action test suite', () => {
 
   for (const scenario of invalidScenarios) {
     it(`It does not post a comment on a closed pull request for (${scenario.response})`, async () => {
-        const issueMergeMessage = 'message';
-        const repoToken = 'token';
-        process.env['INPUT_MERGE-MESSAGE'] = issueMergeMessage;
-        process.env['INPUT_REPO-TOKEN'] = repoToken;
+        process.env['INPUT_REPO-TOKEN'] = 'token';
+        process.env['INPUT_MERGE-MESSAGE'] = 'message';
+        process.env['INPUT_MERGE-LABEL'] = 'label';
   
         process.env['GITHUB_REPOSITORY'] = 'foo/bar';
         process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, scenario.response);
@@ -53,6 +53,8 @@ describe('action test suite', () => {
           .get('/repos/foo/bar/pulls/10/merge')
           .reply(204)
           .post('/repos/foo/bar/pulls/10/reviews', '{\"body\":\"message\",\"event\":\"COMMENT\"}')
+          .reply(200)
+          .post('/repos/foo/bar/issues/10/labels', '{\"labels\":[\"label\"]}')
           .reply(200);
   
         const main = require('../src/main');
@@ -63,10 +65,9 @@ describe('action test suite', () => {
   }
 
   it(`It does not post a comment on a closed pull request when it is not merged`, async () => {
-    const issueMergeMessage = 'message';
-    const repoToken = 'token';
-    process.env['INPUT_MERGE-MESSAGE'] = issueMergeMessage;
-    process.env['INPUT_REPO-TOKEN'] = repoToken;
+    process.env['INPUT_REPO-TOKEN'] = 'token';
+    process.env['INPUT_MERGE-MESSAGE'] = 'message';
+    process.env['INPUT_MERGE-LABEL'] = 'label';
 
     process.env['GITHUB_REPOSITORY'] = 'foo/bar';
     process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, validScenarios[0].response);
@@ -76,6 +77,8 @@ describe('action test suite', () => {
       .get('/repos/foo/bar/pulls/10/merge')
       .reply(404)
       .post('/repos/foo/bar/pulls/10/reviews', '{\"body\":\"message\",\"event\":\"COMMENT\"}')
+      .reply(200)
+      .post('/repos/foo/bar/issues/10/labels', '{\"labels\":[\"label\"]}')
       .reply(200);
 
     const main = require('../src/main');

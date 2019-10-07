@@ -16,32 +16,63 @@ export async function run() {
       return;
     }
 
-    const pull_request = context.payload.pull_request!
     const repoToken = core.getInput('repo-token', {required: true});
-    const client: github.GitHub = new github.GitHub(repoToken)
-    const repo: {owner: string, repo: string} = context.repo;
-    const response = await client.pulls.checkIfMerged({
-      owner: repo.owner,
-      repo: repo.repo,
-      pull_number: pull_request.number
-    });
-    
-    if (response.status != 204) {
+    const client: github.GitHub = new github.GitHub(repoToken);
+    const prNumber = context.payload.pull_request!.number
+
+    const merged = await isMerged(client, prNumber);
+    if (!merged) {
       console.log('No pull request was merged, exiting');
       return;
     } 
 
+    const labels = [core.getInput('merge-label')];
+    await addLabels(client, prNumber, labels);
+
     const message = core.getInput('merge-message');
-    await client.pulls.createReview({
-      owner: repo.owner,
-      repo: repo.repo,
-      pull_number: pull_request.number,
-      body: message,
-      event: 'COMMENT'
-    });
+    await addComment(client, prNumber, message);
   } catch (error) {
     core.setFailed(error.message);
   }
+}
+
+async function isMerged(
+  client: github.GitHub,
+  prNumber: number
+): Promise<boolean> {
+  const response = await client.pulls.checkIfMerged({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    pull_number: prNumber
+  });
+  return response.status == 204;
+}
+
+async function addComment(
+  client: github.GitHub,
+  prNumber: number,
+  comment: string
+) {
+  await client.pulls.createReview({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    pull_number: prNumber,
+    body: comment,
+    event: 'COMMENT'
+  });
+}
+
+async function addLabels(
+  client: github.GitHub,
+  prNumber: number,
+  labels: string[]
+) {
+  await client.issues.addLabels({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    issue_number: prNumber,
+    labels: labels
+  });
 }
 
 run();
