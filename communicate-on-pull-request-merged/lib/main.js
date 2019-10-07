@@ -32,7 +32,7 @@ function run() {
             const repoToken = core.getInput('repo-token', { required: true });
             const client = new github.GitHub(repoToken);
             const prNumber = github.context.payload.pull_request.number;
-            const merged = yield isMerged(client, prNumber);
+            const merged = github.context.payload.pull_request['merged'];
             if (!merged) {
                 console.log('No pull request was merged, exiting');
                 return;
@@ -46,16 +46,6 @@ function run() {
     });
 }
 exports.run = run;
-function isMerged(client, prNumber) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const response = yield client.pulls.checkIfMerged({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            pull_number: prNumber
-        });
-        return response.status == 204;
-    });
-}
 function addComment(client, prNumber, comment) {
     return __awaiter(this, void 0, void 0, function* () {
         yield client.pulls.createReview({

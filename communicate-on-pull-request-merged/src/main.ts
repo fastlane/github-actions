@@ -18,7 +18,7 @@ export async function run() {
     const client: github.GitHub = new github.GitHub(repoToken);
     const prNumber = github.context.payload.pull_request!.number
 
-    const merged = await isMerged(client, prNumber);
+    const merged = github.context.payload.pull_request!['merged'];
     if (!merged) {
       console.log('No pull request was merged, exiting');
       return;
@@ -29,18 +29,6 @@ export async function run() {
   } catch (error) {
     core.setFailed(error.message);
   }
-}
-
-async function isMerged(
-  client: github.GitHub,
-  prNumber: number
-): Promise<boolean> {
-  const response = await client.pulls.checkIfMerged({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    pull_number: prNumber
-  });
-  return response.status == 204;
 }
 
 async function addComment(
