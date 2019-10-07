@@ -1,6 +1,6 @@
-# Pull Request Release Lifecycle
+# Communicate on pull request merged
 
-An action for adding comments and labels to a pull request during the release lifecycle (code changes merged and released).
+An action for adding comments and labels to a pull request which is merged.
 
 # Usage 
 
@@ -8,7 +8,7 @@ See [action.yml](action.yml)
 
 ```yaml
 steps:
-- uses: fastlane/github-action/pr-release-lifecycle@latest
+- uses: fastlane/github-action/communicate-on-pull-request-merged@latest
   with:
     repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```
