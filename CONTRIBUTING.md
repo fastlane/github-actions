@@ -1,6 +1,6 @@
 ## Development
 
-First of all, thank you for your interested in this project. Please read the documentation here to being contributing. 
+First of all, thank you for your interest in this project. Please read the documentation here to begin contributing. 
 
 ### Creating an Action
 
@@ -12,11 +12,11 @@ Read more about GitHub Actions [here](https://help.github.com/en/articles/gettin
 
 ### Recommendations on versioning your action
 
-Since we keep multiple actions in one repository, all the actions are released in one batch (we do not support semantic versioning). 
+Since we keep multiple actions in one repository, all the actions are released in one batch (we do not support semantic versioning yet). 
 
 **JavaScript / TypeScript Action**
 
-When your pull request is merged:
+When your pull request was merged:
 
 - create a new branch
 - comment out `node_modules` in `.gitignore`
@@ -25,7 +25,7 @@ When your pull request is merged:
 # comment out in distribution branches
 # node_modules/
 ```
-- add **only** your production dependencies
+- add **only** your production dependencies:
 
 ```bash
 $ npm prune --production
@@ -34,11 +34,13 @@ $ git commit -a -m "Add production dependencies"
 $ git push
 ```
 
-- open a pull request with a destionation branch to `latest` branch
+- open a pull request with a destination branch to `latest` branch
 - everything is ready to be :ship:
 
 **Docker Action**
 
+When your pull request was merged:
+
 - create a new branch
-- open a pull request with a destionation branch to `latest` branch
+- open a pull request with a destination branch to `latest` branch
 - everything is ready to be :ship:
