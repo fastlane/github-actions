@@ -1,8 +1,8 @@
 {
-  "name": "pr-release-lifecycle",
+  "name": "communicate-on-pull-request-merged",
   "version": "0.0.0",
   "private": true,
-  "description": "An action for adding comments and labels to a pull request during the release lifecycle (code changes merged and released)",
+  "description": "An action for adding comments and labels to a pull request when it is merged",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
