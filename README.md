@@ -1,6 +1,6 @@
 ## GitHub Actions Maintainer 
 
-The GitHub Actions Maintainer provides a set of GitHub Actions to make maitaining project easier.
+The GitHub Actions Maintainer provides a set of GitHub Actions to make maintaining projects easier.
 
 ## Actions
 
