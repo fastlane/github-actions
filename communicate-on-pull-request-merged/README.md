@@ -1,6 +1,6 @@
 # Communicate on pull request merged
 
-An action for adding comments and labels to a pull request which is merged.
+An action for adding comments and labels to a pull request when it is merged.
 
 # Usage 
 
