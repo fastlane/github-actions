@@ -1,0 +1,8 @@
+{
+    "pull_request": {
+        "number": 10,
+        "body": "This is a pr description.",
+        "merged": false
+    }, 
+    "action": "closed"
+}
