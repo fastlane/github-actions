@@ -1,6 +1,6 @@
 ## Development
 
-First of all, thank you for your interest in this project. Please read the documentation here to begin contributing. 
+Thank you for your interest in this project. Please read the documentation here to begin contributing. 
 
 ### Creating an Action
 
@@ -12,7 +12,7 @@ Read more about GitHub Actions [here](https://help.github.com/en/articles/gettin
 
 ### Recommendations on versioning your action
 
-Since we keep multiple actions in one repository, all the actions are released in one batch (we do not support semantic versioning yet). 
+Since we keep multiple Actions in one repository, all the Actions are released in one batch (we do not support semantic versioning yet). 
 
 **JavaScript / TypeScript Action**
 
