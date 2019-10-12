@@ -1,13 +1,13 @@
-## GitHub Actions Maintainer 
+## Fastlane GitHub Actions
 
-The GitHub Actions Maintainer provides a set of GitHub Actions to make maintaining projects easier.
+The Fastlane GitHub Actions provides a set of GitHub Actions to make maintaining projects easier.
 
 ## Actions
 
 - 🌏 [@github-actions/fastlane-env-reminder](fastlane-env-reminder)
 
 
-   Adds a comment to include fastlane environment information in an issue description if it is missing. Read more [here](fastlane-env-reminder).
+   Adds a comment to include _fastlane_ environment information in an issue description if it is missing. Read more [here](fastlane-env-reminder).
 
 ## Versioning 
 
