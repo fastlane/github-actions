@@ -3,9 +3,11 @@ import * as github from '@actions/github';
 
 export async function run() {
   try {
-    const isPullRequest: boolean = !!github.context.payload.pull_request
+    const isPullRequest: boolean = !!github.context.payload.pull_request;
     if (!isPullRequest) {
-      console.log('The event that triggered this action was not a pull request, exiting');
+      console.log(
+        'The event that triggered this action was not a pull request, exiting'
+      );
       return;
     }
 
@@ -16,13 +18,13 @@ export async function run() {
 
     const repoToken = core.getInput('repo-token', {required: true});
     const client: github.GitHub = new github.GitHub(repoToken);
-    const prNumber = github.context.payload.pull_request!.number
+    const prNumber = github.context.payload.pull_request!.number;
 
     const merged = github.context.payload.pull_request!['merged'];
     if (!merged) {
       console.log('No pull request was merged, exiting');
       return;
-    } 
+    }
 
     await addLabels(client, prNumber, [core.getInput('pr-label')]);
     await addComment(client, prNumber, core.getInput('pr-comment'));
