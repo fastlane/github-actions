@@ -10,7 +10,7 @@ Thank you for your interest in this project. Please read the documentation here 
 
 Read more about GitHub Actions [here](https://help.github.com/en/articles/getting-started-with-github-actions).
 
-### Recommendations on versioning your action
+### How to release new versions
 
 Since we keep multiple Actions in one repository, all the Actions are released in one batch (we do not support semantic versioning yet). 
 
@@ -18,7 +18,7 @@ Since we keep multiple Actions in one repository, all the Actions are released i
 
 When your pull request was merged:
 
-- create a new branch
+- create a new branch from `master` branch
 - comment out `node_modules` in `.gitignore`
 
 ```
@@ -41,6 +41,6 @@ $ git push
 
 When your pull request was merged:
 
-- create a new branch
+- create a new branch from `master` branch
 - open a pull request with a destination branch to `latest` branch
 - everything is ready to be :ship:
