@@ -1,5 +1,5 @@
 name: 'Communicate on pull request merged'
-description: 'An action for adding comments and labels to a pull request which is merged'
+description: 'An action for adding comments and labels to a pull request when it is merged'
 author: 'fastlane'
 inputs:
   repo-token:
