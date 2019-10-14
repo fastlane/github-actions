@@ -16,7 +16,7 @@ Since we keep multiple Actions in one repository, all the Actions are released i
 
 **JavaScript / TypeScript Action**
 
-When your pull request was merged:
+To prepare the code for a new release:
 
 - create a new branch from `master` branch
 - comment out `node_modules` in `.gitignore`
@@ -39,7 +39,7 @@ $ git push
 
 **Docker Action**
 
-When your pull request was merged:
+To prepare the code for a new release:
 
 - create a new branch from `master` branch
 - open a pull request with a destination branch to `latest` branch
