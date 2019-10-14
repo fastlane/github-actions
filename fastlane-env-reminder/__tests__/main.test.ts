@@ -1,22 +1,28 @@
 const path = require('path');
 const nock = require('nock');
 
-const validScenarios = [{
-  response: 'issue.json'
-}
+const validScenarios = [
+  {
+    response: 'issue.json'
+  }
 ];
 
-const invalidScenarios = [{
-  response: 'pull-request.json',
-}, {
-  response: 'action-closed.json',
-}, {
-  response: 'issue-missing-body.json',
-}, {
-  response: 'issue-contains-fastlane-env.json',
-}, {
-  response: 'issue-feature-request.json'
-}
+const invalidScenarios = [
+  {
+    response: 'pull-request.json'
+  },
+  {
+    response: 'action-closed.json'
+  },
+  {
+    response: 'issue-missing-body.json'
+  },
+  {
+    response: 'issue-contains-fastlane-env.json'
+  },
+  {
+    response: 'issue-feature-request.json'
+  }
 ];
 
 describe('action test suite', () => {
@@ -28,11 +34,14 @@ describe('action test suite', () => {
       process.env['INPUT_REPO-TOKEN'] = repoToken;
 
       process.env['GITHUB_REPOSITORY'] = 'foo/bar';
-      process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, scenario.response);
+      process.env['GITHUB_EVENT_PATH'] = path.join(
+        __dirname,
+        scenario.response
+      );
 
       const api = nock('https://api.github.com')
         .persist()
-        .post('/repos/foo/bar/issues/10/comments', '{\"body\":\"message\"}')
+        .post('/repos/foo/bar/issues/10/comments', '{"body":"message"}')
         .reply(200);
 
       const main = require('../src/main');
@@ -50,11 +59,14 @@ describe('action test suite', () => {
       process.env['INPUT_REPO-TOKEN'] = repoToken;
 
       process.env['GITHUB_REPOSITORY'] = 'foo/bar';
-      process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, scenario.response);
+      process.env['GITHUB_EVENT_PATH'] = path.join(
+        __dirname,
+        scenario.response
+      );
 
       const api = nock('https://api.github.com')
         .persist()
-        .post('/repos/foo/bar/issues/10/comments', '{\"body\":\"message\"}')
+        .post('/repos/foo/bar/issues/10/comments', '{"body":"message"}')
         .reply(200);
 
       const main = require('../src/main');
