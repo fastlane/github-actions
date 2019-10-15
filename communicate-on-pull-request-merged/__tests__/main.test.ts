@@ -45,6 +45,7 @@ describe('action test suite', () => {
       const main = require('../src/main');
       await main.run();
 
+      expect(process.env['PULL_REQUEST_USER_LOGIN']).toEqual('octocat');
       expect(api.isDone()).toBeTruthy();
     });
   }

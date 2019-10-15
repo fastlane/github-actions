@@ -31,12 +31,14 @@ function run() {
             }
             const repoToken = core.getInput('repo-token', { required: true });
             const client = new github.GitHub(repoToken);
-            const prNumber = github.context.payload.pull_request.number;
-            const merged = github.context.payload.pull_request['merged'];
+            const pullRequest = github.context.payload.pull_request;
+            const prNumber = pullRequest.number;
+            const merged = pullRequest['merged'];
             if (!merged) {
                 console.log('No pull request was merged, exiting');
                 return;
             }
+            core.exportVariable('PULL_REQUEST_USER_LOGIN', pullRequest['user']['login']);
             yield addLabels(client, prNumber, [core.getInput('pr-label')]);
             yield addComment(client, prNumber, core.getInput('pr-comment'));
         }
