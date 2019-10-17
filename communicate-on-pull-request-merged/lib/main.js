@@ -38,7 +38,7 @@ function run() {
                 return;
             }
             yield addLabels(client, prNumber, [core.getInput('pr-label')]);
-            yield addComment(client, prNumber, core.getInput('pr-comment'));
+            yield addComment(client, prNumber, core.getInput('pr-comment', { required: true }));
         }
         catch (error) {
             core.setFailed(error.message);
