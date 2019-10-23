@@ -104,10 +104,10 @@ const invalidScenarios = [
   }
 ];
 
-describe('referenced issue detector from a pull request test suite', () => {
+describe('pull request parser test suite', () => {
   for (const scenario of validScenarios) {
-    const parser = require('../src/pull-request-parser');
     it(`It detects referenced issue for (${scenario.prBody})`, async () => {
+      const parser = require('../src/pull-request-parser');
       expect(
         parser.getReferencedIssue(
           scenario.owner,
