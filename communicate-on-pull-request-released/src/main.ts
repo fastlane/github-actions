@@ -39,7 +39,15 @@ export async function run() {
         prNumber,
         `Congratulations! :tada: This was released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`
       );
-      await removeLabel(client, prNumber, core.getInput('pr-label-to-remove'));
+      const labelToRemove = core.getInput('pr-label-to-remove');
+      const canRemoveLabel = await canRemoveLabelFromIssue(
+        client,
+        prNumber,
+        labelToRemove
+      );
+      if (canRemoveLabel) {
+        await removeLabel(client, prNumber, labelToRemove);
+      }
       await addLabels(client, prNumber, [core.getInput('pr-label-to-add')]);
       await addCommentToReferencedIssue(client, prNumber, release);
     }
@@ -91,6 +99,25 @@ async function getPullRequest(client: github.GitHub, prNumber: number) {
     repo: github.context.repo.repo,
     pull_number: prNumber
   });
+}
+
+async function canRemoveLabelFromIssue(
+  client: github.GitHub,
+  prNumber: number,
+  label: string
+): Promise<boolean> {
+  const issueLabels = await client.issues.listLabelsOnIssue({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    issue_number: prNumber
+  });
+
+  for (let issueLabel of issueLabels) {
+    if (issueLabel.name === label) {
+      return true;
+    }
+  }
+  return false;
 }
 
 async function addLabels(

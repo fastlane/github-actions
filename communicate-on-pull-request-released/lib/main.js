@@ -41,7 +41,11 @@ function run() {
             const prNumbers = releaseParser.getReferencedPullRequests(release.body);
             for (let prNumber of prNumbers) {
                 yield addCommentToPullRequest(client, prNumber, `Congratulations! :tada: This was released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`);
-                yield removeLabel(client, prNumber, core.getInput('pr-label-to-remove'));
+                const labelToRemove = core.getInput('pr-label-to-remove');
+                const canRemoveLabel = yield canRemoveLabelFromIssue(client, prNumber, labelToRemove);
+                if (canRemoveLabel) {
+                    yield removeLabel(client, prNumber, labelToRemove);
+                }
                 yield addLabels(client, prNumber, [core.getInput('pr-label-to-add')]);
                 yield addCommentToReferencedIssue(client, prNumber, release);
             }
@@ -86,6 +90,21 @@ function getPullRequest(client, prNumber) {
             repo: github.context.repo.repo,
             pull_number: prNumber
         });
+    });
+}
+function canRemoveLabelFromIssue(client, prNumber, label) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const issueLabels = yield client.issues.listLabelsOnIssue({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            issue_number: prNumber
+        });
+        for (let issueLabel of issueLabels) {
+            if (issueLabel.name === label) {
+                return true;
+            }
+        }
+        return false;
     });
 }
 function addLabels(client, prNumber, labels) {
