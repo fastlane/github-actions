@@ -139,10 +139,12 @@ function addIssueComment(client, issueNumber, message) {
     });
 }
 function extractReleaseFromPayload() {
+    console.debug(github.context.payload);
     const release = github.context.payload['release'];
-    if (release == null) {
+    if (release === 'undefined') {
         return undefined;
     }
+    console.debug(release);
     const tag = release['tag_name'];
     const body = release['body'];
     const htmlURL = release['html_url'];

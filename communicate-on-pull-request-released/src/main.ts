@@ -161,10 +161,13 @@ async function addIssueComment(
 }
 
 function extractReleaseFromPayload(): Release | undefined {
+  console.debug(github.context.payload);
   const release = github.context.payload['release'];
-  if (release == null) {
+  if (release === 'undefined') {
     return undefined;
   }
+
+  console.debug(release);
 
   const tag = release['tag_name'];
   const body = release['body'];
