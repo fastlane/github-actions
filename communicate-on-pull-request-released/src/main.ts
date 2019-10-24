@@ -79,29 +79,27 @@ async function addCommentToReferencedIssue(
 ) {
   const pullRequest = await getPullRequest(client, prNumber);
   console.log(`A PR metadata for ${prNumber} --> ${pullRequest}`);
-  const body = pullRequest['body'];
-  if (body) {
-    const issueNumber = pullRequestParser.getReferencedIssue(
-      github.context.repo.owner,
-      github.context.repo.repo,
-      body
-    );
-    if (issueNumber) {
-      const message = [
-        `The pull request #${prNumber} that closed this issue was merged and released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`,
-        `Please let us know if the functionality works as expected as a reply here. If it does not, please open a new issue. Thanks!`
-      ];
-      await addIssueComment(client, issueNumber, message.join('\n'));
-    }
+  const issueNumber = pullRequestParser.getReferencedIssue(
+    github.context.repo.owner,
+    github.context.repo.repo,
+    pullRequest.body
+  );
+  if (issueNumber) {
+    const message = [
+      `The pull request #${prNumber} that closed this issue was merged and released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`,
+      `Please let us know if the functionality works as expected as a reply here. If it does not, please open a new issue. Thanks!`
+    ];
+    await addIssueComment(client, issueNumber, message.join('\n'));
   }
 }
 
 async function getPullRequest(client: github.GitHub, prNumber: number) {
-  await client.pulls.get({
+  const response = await client.pulls.get({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     pull_number: prNumber
   });
+  return response.data;
 }
 
 async function canRemoveLabelFromIssue(
