@@ -94,11 +94,12 @@ function getPullRequest(client, prNumber) {
 }
 function canRemoveLabelFromIssue(client, prNumber, label) {
     return __awaiter(this, void 0, void 0, function* () {
-        const issueLabels = yield client.issues.listLabelsOnIssue({
+        const response = yield client.issues.listLabelsOnIssue({
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
             issue_number: prNumber
         });
+        const issueLabels = response.data;
         for (let issueLabel of issueLabels) {
             if (issueLabel.name === label) {
                 return true;

@@ -106,12 +106,13 @@ async function canRemoveLabelFromIssue(
   prNumber: number,
   label: string
 ): Promise<boolean> {
-  const issueLabels = await client.issues.listLabelsOnIssue({
+  const response = await client.issues.listLabelsOnIssue({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: prNumber
   });
 
+  const issueLabels = response.data;
   for (let issueLabel of issueLabels) {
     if (issueLabel.name === label) {
       return true;
