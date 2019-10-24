@@ -32,9 +32,7 @@ export async function run() {
     const repoToken = core.getInput('repo-token', {required: true});
     const client: github.GitHub = new github.GitHub(repoToken);
 
-    console.debug(`Getting pr numbers for: ${release}`);
     const prNumbers = releaseParser.getReferencedPullRequests(release.body);
-    console.debug(prNumbers);
     for (let prNumber of prNumbers) {
       await addCommentToPullRequest(
         client,
@@ -78,7 +76,6 @@ async function addCommentToReferencedIssue(
   release: Release
 ) {
   const pullRequest = await getPullRequest(client, prNumber);
-  console.log(`A PR metadata for ${prNumber} --> ${pullRequest}`);
   const issueNumber = pullRequestParser.getReferencedIssue(
     github.context.repo.owner,
     github.context.repo.repo,

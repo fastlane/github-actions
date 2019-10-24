@@ -38,9 +38,7 @@ function run() {
             }
             const repoToken = core.getInput('repo-token', { required: true });
             const client = new github.GitHub(repoToken);
-            console.debug(`Getting pr numbers for: ${release}`);
             const prNumbers = releaseParser.getReferencedPullRequests(release.body);
-            console.debug(prNumbers);
             for (let prNumber of prNumbers) {
                 yield addCommentToPullRequest(client, prNumber, `Congratulations! :tada: This was released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`);
                 const labelToRemove = core.getInput('pr-label-to-remove');
@@ -72,7 +70,6 @@ function addCommentToPullRequest(client, prNumber, comment) {
 function addCommentToReferencedIssue(client, prNumber, release) {
     return __awaiter(this, void 0, void 0, function* () {
         const pullRequest = yield getPullRequest(client, prNumber);
-        console.log(`A PR metadata for ${prNumber} --> ${pullRequest}`);
         const issueNumber = pullRequestParser.getReferencedIssue(github.context.repo.owner, github.context.repo.repo, pullRequest.body);
         if (issueNumber) {
             const message = [
