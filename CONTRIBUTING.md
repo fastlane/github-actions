@@ -20,20 +20,17 @@ To prepare the code for a new release:
 
 - create a new branch from `master` branch
 - comment out `node_modules` in `.gitignore`
-
   ```
   # comment out in distribution branches
   # node_modules/
   ```
 - add **only** your production dependencies:
-
   ```bash
   $ npm prune --production
   $ git add node_modules
   $ git commit -a -m "Add production dependencies"
   $ git push
   ```
-
 - open a pull request with a destination branch to `latest` branch
 - everything is ready to be shipped :ship:
 
