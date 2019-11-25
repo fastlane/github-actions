@@ -12,6 +12,10 @@ The Fastlane GitHub Actions provide a set of GitHub Actions to make maintaining 
 
    Adds a comment and a label to a pull request when it is merged. Read more [here](communicate-on-pull-request-merged).
 
+- 🚀 [@github-actions/communicate-on-pull-request-released](communicate-on-pull-request-released)
+
+   Adds a comment and a label to a pull request and referenced issue when it is released. Read more [here](communicate-on-pull-request-released).
+
 ## Versioning 
 
 All the actions are released in one batch. We do not support semantic versioning (yet). Reference a `latest` branch in your workflow:

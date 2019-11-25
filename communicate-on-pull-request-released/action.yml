@@ -1,0 +1,16 @@
+name: 'Communicate on pull request released'
+description: 'An action for adding comments and labels to a pull request and referenced issue when the pull request is released'
+author: 'fastlane'
+inputs:
+  repo-token:
+    description: 'Token for the repo. Can be passed in using {{ secrets.GITHUB_TOKEN }}'
+    required: true
+  pr-label-to-add:
+    description: 'The label to apply when a pull request is released'
+    default: 'status: released'
+  pr-label-to-remove:
+    description: 'The label to remove when a pull request is released'
+    default: 'status: included-in-next-release'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
