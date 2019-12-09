@@ -27,7 +27,11 @@ export async function run() {
     }
 
     await addLabels(client, prNumber, [core.getInput('pr-label')]);
-    await addComment(client, prNumber, core.getInput('pr-comment'));
+    await addComment(
+      client,
+      prNumber,
+      core.getInput('pr-comment', {required: true})
+    );
   } catch (error) {
     core.setFailed(error.message);
   }
