@@ -1,8 +1,8 @@
 {
-  "name": "fastlane-env-reminder-action",
+  "name": "communicate-on-pull-request-merged",
   "version": "0.0.0",
   "private": true,
-  "description": "An action for adding a comment to include `fastlane env` in an issue description",
+  "description": "An action for adding comments and labels to a pull request when it is merged",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",

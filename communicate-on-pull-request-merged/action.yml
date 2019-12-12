@@ -1,0 +1,16 @@
+name: 'Communicate on pull request merged'
+description: 'An action for adding comments and labels to a pull request when it is merged'
+author: 'fastlane'
+inputs:
+  repo-token:
+    description: 'Token for the repo. Can be passed in using {{ secrets.GITHUB_TOKEN }}'
+    required: true
+  pr-comment:
+    description: 'A comment to post on a pull request when code changes are merged'
+    required: true
+  pr-label:
+    description: 'The label to apply when a pull request is merged'
+    default: 'status: included-in-next-release'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
