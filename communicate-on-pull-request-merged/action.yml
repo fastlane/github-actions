@@ -8,9 +8,12 @@ inputs:
   pr-comment:
     description: 'A comment to post on a pull request when code changes are merged'
     required: true
-  pr-label:
+  pr-label-to-add:
     description: 'The label to apply when a pull request is merged'
     default: 'status: included-in-next-release'
+  pr-label-to-remove:
+      description: 'The label to remove when a pull request is merged'
+      default: 'status: needs-attention'
 runs:
   using: 'docker'
   image: 'Dockerfile'
