@@ -24,7 +24,8 @@ describe('action test suite', () => {
     it(`It posts a comment on a merged issue for (${scenario.response})`, async () => {
       process.env['INPUT_REPO-TOKEN'] = 'token';
       process.env['INPUT_PR-COMMENT'] = 'message';
-      process.env['INPUT_PR-LABEL'] = 'label';
+      process.env['INPUT_PR-LABEL-TO-ADD'] = 'label-to-add';
+      process.env['INPUT_PR-LABEL-TO-REMOVE'] = 'label-to-remove';
 
       process.env['GITHUB_REPOSITORY'] = 'foo/bar';
       process.env['GITHUB_EVENT_PATH'] = path.join(
@@ -39,7 +40,9 @@ describe('action test suite', () => {
           '{"body":"message","event":"COMMENT"}'
         )
         .reply(200)
-        .post('/repos/foo/bar/issues/10/labels', '{"labels":["label"]}')
+        .get('/repos/foo/bar/issues/10/labels')
+        .reply(200, JSON.parse('[]'))
+        .post('/repos/foo/bar/issues/10/labels', '{"labels":["label-to-add"]}')
         .reply(200);
 
       const main = require('../src/main');
@@ -53,7 +56,8 @@ describe('action test suite', () => {
     it(`It does not post a comment on a closed pull request for (${scenario.response})`, async () => {
       process.env['INPUT_REPO-TOKEN'] = 'token';
       process.env['INPUT_PR-COMMENT'] = 'message';
-      process.env['INPUT_PR-LABEL'] = 'label';
+      process.env['INPUT_PR-LABEL-TO-ADD'] = 'label-to-add';
+      process.env['INPUT_PR-LABEL-TO-REMOVE'] = 'label-to-remove';
 
       process.env['GITHUB_REPOSITORY'] = 'foo/bar';
       process.env['GITHUB_EVENT_PATH'] = path.join(
@@ -68,7 +72,9 @@ describe('action test suite', () => {
           '{"body":"message","event":"COMMENT"}'
         )
         .reply(200)
-        .post('/repos/foo/bar/issues/10/labels', '{"labels":["label"]}')
+        .get('/repos/foo/bar/issues/10/labels')
+        .reply(200, JSON.parse('[]'))
+        .post('/repos/foo/bar/issues/10/labels', '{"labels":["label-to-add"]}')
         .reply(200);
 
       const main = require('../src/main');

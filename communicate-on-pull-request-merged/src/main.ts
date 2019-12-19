@@ -26,7 +26,17 @@ export async function run() {
       return;
     }
 
-    await addLabels(client, prNumber, [core.getInput('pr-label')]);
+    const labelToRemove = core.getInput('pr-label-to-remove');
+    const canRemoveLabel = await canRemoveLabelFromIssue(
+      client,
+      prNumber,
+      labelToRemove
+    );
+    if (canRemoveLabel) {
+      await removeLabel(client, prNumber, labelToRemove);
+    }
+
+    await addLabels(client, prNumber, [core.getInput('pr-label-to-add')]);
     await addComment(
       client,
       prNumber,
@@ -61,6 +71,39 @@ async function addLabels(
     repo: github.context.repo.repo,
     issue_number: prNumber,
     labels: labels
+  });
+}
+
+async function canRemoveLabelFromIssue(
+  client: github.GitHub,
+  prNumber: number,
+  label: string
+): Promise<boolean> {
+  const response = await client.issues.listLabelsOnIssue({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    issue_number: prNumber
+  });
+
+  const issueLabels = response.data;
+  for (let issueLabel of issueLabels) {
+    if (issueLabel.name === label) {
+      return true;
+    }
+  }
+  return false;
+}
+
+async function removeLabel(
+  client: github.GitHub,
+  prNumber: number,
+  label: string
+) {
+  await client.issues.removeLabel({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    issue_number: prNumber,
+    name: label
   });
 }
 
