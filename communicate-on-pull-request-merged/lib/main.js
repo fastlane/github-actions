@@ -37,7 +37,12 @@ function run() {
                 console.log('No pull request was merged, exiting');
                 return;
             }
-            yield addLabels(client, prNumber, [core.getInput('pr-label')]);
+            const labelToRemove = core.getInput('pr-label-to-remove');
+            const canRemoveLabel = yield canRemoveLabelFromIssue(client, prNumber, labelToRemove);
+            if (canRemoveLabel) {
+                yield removeLabel(client, prNumber, labelToRemove);
+            }
+            yield addLabels(client, prNumber, [core.getInput('pr-label-to-add')]);
             yield addComment(client, prNumber, core.getInput('pr-comment', { required: true }));
         }
         catch (error) {
@@ -64,6 +69,32 @@ function addLabels(client, prNumber, labels) {
             repo: github.context.repo.repo,
             issue_number: prNumber,
             labels: labels
+        });
+    });
+}
+function canRemoveLabelFromIssue(client, prNumber, label) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield client.issues.listLabelsOnIssue({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            issue_number: prNumber
+        });
+        const issueLabels = response.data;
+        for (let issueLabel of issueLabels) {
+            if (issueLabel.name === label) {
+                return true;
+            }
+        }
+        return false;
+    });
+}
+function removeLabel(client, prNumber, label) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield client.issues.removeLabel({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            issue_number: prNumber,
+            name: label
         });
     });
 }
