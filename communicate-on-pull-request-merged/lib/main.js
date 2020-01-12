@@ -44,7 +44,11 @@ function run() {
                 yield removeLabel(client, prNumber, labelToRemove);
             }
             yield addLabels(client, prNumber, [core.getInput('pr-label-to-add')]);
-            yield addComment(client, prNumber, core.getInput('pr-comment', { required: true }));
+            var comment = core.getInput('pr-comment', { required: false });
+            if (comment.length == 0) {
+                comment = defaultPrComment(pullRequest.user.login);
+            }
+            yield addComment(client, prNumber, comment);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -119,5 +123,19 @@ function removeLabel(client, prNumber, label) {
             name: label
         });
     });
+}
+function defaultPrComment(prAuthor) {
+    return `Hey @${prAuthor} :wave:
+                   
+  Thank you for your contribution to _fastlane_ and congrats on getting this pull request merged :tada:
+  
+  The code change now lives in the \`master\` branch, however it wasn't released to [RubyGems](https://rubygems.org/gems/fastlane) yet.
+  
+  We usually ship about once a week, and your PR will be included in the next one.
+  
+  
+  Please let us know if this change requires an immediate release by adding a comment here :+1:
+  
+  We'll notify you once we shipped a new release with your changes :rocket:`;
 }
 run();

@@ -14,7 +14,6 @@ export async function run() {
     const client: github.GitHub = new github.GitHub(repoToken);
 
     const commit = await getCommit(client, github.context.sha);
-
     if (!isMergeCommit(commit)) {
       console.log('No merge commit, exiting');
       return;
@@ -23,7 +22,6 @@ export async function run() {
     const {
       data: [pullRequest]
     } = await getPullRequests(client, github.context.sha);
-
     const prNumber = pullRequest.number;
     const merged = pullRequest.state == 'closed';
     if (!merged) {
@@ -42,11 +40,13 @@ export async function run() {
     }
 
     await addLabels(client, prNumber, [core.getInput('pr-label-to-add')]);
-    await addComment(
-      client,
-      prNumber,
-      core.getInput('pr-comment', {required: true})
-    );
+
+    var comment = core.getInput('pr-comment', {required: false});
+    if (comment.length == 0) {
+      comment = defaultPrComment(pullRequest.user.login);
+    }
+
+    await addComment(client, prNumber, comment);
   } catch (error) {
     core.setFailed(error.message);
   }
@@ -130,6 +130,21 @@ async function removeLabel(
     issue_number: prNumber,
     name: label
   });
+}
+
+function defaultPrComment(prAuthor: string): string {
+  return `Hey @${prAuthor} :wave:
+                   
+  Thank you for your contribution to _fastlane_ and congrats on getting this pull request merged :tada:
+  
+  The code change now lives in the \`master\` branch, however it wasn't released to [RubyGems](https://rubygems.org/gems/fastlane) yet.
+  
+  We usually ship about once a week, and your PR will be included in the next one.
+  
+  
+  Please let us know if this change requires an immediate release by adding a comment here :+1:
+  
+  We'll notify you once we shipped a new release with your changes :rocket:`;
 }
 
 run();
