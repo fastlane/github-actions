@@ -33,8 +33,8 @@ function run() {
             }
             const { data: [pullRequest] } = yield getPullRequests(client, github.context.sha);
             const prNumber = pullRequest.number;
-            const merged = pullRequest.state == 'closed';
-            if (!merged) {
+            const closed = pullRequest.state == 'closed';
+            if (!closed) {
                 console.log('No pull request was closed, exiting');
                 return;
             }
