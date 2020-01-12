@@ -20,21 +20,22 @@ const github = __importStar(require("@actions/github"));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const isPullRequest = !!github.context.payload.pull_request;
-            if (!isPullRequest) {
-                console.log('The event that triggered this action was not a pull request, exiting');
-                return;
-            }
-            if (github.context.payload.action !== 'closed') {
-                console.log('No pull request was closed, exiting');
+            if (github.context.eventName !== 'push') {
+                console.log('The event that triggered this action was not a push, exiting');
                 return;
             }
             const repoToken = core.getInput('repo-token', { required: true });
             const client = new github.GitHub(repoToken);
-            const prNumber = github.context.payload.pull_request.number;
-            const merged = github.context.payload.pull_request['merged'];
+            const commit = yield getCommit(client, github.context.sha);
+            if (!isMergeCommit(commit)) {
+                console.log('No merge commit, exiting');
+                return;
+            }
+            const { data: [pullRequest] } = yield getPullRequests(client, github.context.sha);
+            const prNumber = pullRequest.number;
+            const merged = pullRequest.state == 'closed';
             if (!merged) {
-                console.log('No pull request was merged, exiting');
+                console.log('No pull request was closed, exiting');
                 return;
             }
             const labelToRemove = core.getInput('pr-label-to-remove');
@@ -51,6 +52,27 @@ function run() {
     });
 }
 exports.run = run;
+function getCommit(client, commit_sha) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield client.git.getCommit({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            commit_sha: commit_sha
+        });
+    });
+}
+function isMergeCommit(commit) {
+    return commit.data.parents.length > 1;
+}
+function getPullRequests(client, commit_sha) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield client.repos.listPullRequestsAssociatedWithCommit({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            commit_sha: commit_sha
+        });
+    });
+}
 function addComment(client, prNumber, comment) {
     return __awaiter(this, void 0, void 0, function* () {
         yield client.pulls.createReview({

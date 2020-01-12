@@ -3,26 +3,31 @@ import * as github from '@actions/github';
 
 export async function run() {
   try {
-    const isPullRequest: boolean = !!github.context.payload.pull_request;
-    if (!isPullRequest) {
+    if (github.context.eventName !== 'push') {
       console.log(
-        'The event that triggered this action was not a pull request, exiting'
+        'The event that triggered this action was not a push, exiting'
       );
-      return;
-    }
-
-    if (github.context.payload.action !== 'closed') {
-      console.log('No pull request was closed, exiting');
       return;
     }
 
     const repoToken = core.getInput('repo-token', {required: true});
     const client: github.GitHub = new github.GitHub(repoToken);
-    const prNumber = github.context.payload.pull_request!.number;
 
-    const merged = github.context.payload.pull_request!['merged'];
+    const commit = await getCommit(client, github.context.sha);
+
+    if (!isMergeCommit(commit)) {
+      console.log('No merge commit, exiting');
+      return;
+    }
+
+    const {
+      data: [pullRequest]
+    } = await getPullRequests(client, github.context.sha);
+
+    const prNumber = pullRequest.number;
+    const merged = pullRequest.state == 'closed';
     if (!merged) {
-      console.log('No pull request was merged, exiting');
+      console.log('No pull request was closed, exiting');
       return;
     }
 
@@ -45,6 +50,26 @@ export async function run() {
   } catch (error) {
     core.setFailed(error.message);
   }
+}
+
+async function getCommit(client: github.GitHub, commit_sha: string) {
+  return await client.git.getCommit({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    commit_sha: commit_sha
+  });
+}
+
+function isMergeCommit(commit): boolean {
+  return commit.data.parents.length > 1;
+}
+
+async function getPullRequests(client: github.GitHub, commit_sha: string) {
+  return await client.repos.listPullRequestsAssociatedWithCommit({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    commit_sha: commit_sha
+  });
 }
 
 async function addComment(
