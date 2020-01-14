@@ -16,7 +16,7 @@ jobs:
   lock:
     runs-on: ubuntu-latest
     steps:
-    - uses: fastlane/github-action/lock@latest
+    - uses: fastlane/github-actions/lock@latest
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```
