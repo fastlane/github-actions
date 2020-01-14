@@ -16,6 +16,10 @@ The Fastlane GitHub Actions provide a set of GitHub Actions to make maintaining 
 
    Adds a comment and a label to a pull request and referenced issue when it is released. Read more [here](communicate-on-pull-request-released).
 
+- 🔒 [@github-actions/lock](lock)
+
+   Locks closed, inactive issues and pull requests after the given number of days. Read more [here](lock).
+
 ## Versioning 
 
 All the actions are released in one batch. We do not support semantic versioning (yet). Reference a `latest` branch in your workflow:
