@@ -63,7 +63,8 @@ async function processIssues(
     core.debug(
       `Found issue: "${issue.title}", last updated ${issue.updated_at}`
     );
-    if (wasLastUpdatedBefore(issue, daysBeforeLock)) {
+
+    if (wasLastUpdatedBefore(issue, daysBeforeLock) && !issue.locked) {
       operationsLeft -= await lock(client, issue);
     }
 

@@ -60,7 +60,7 @@ function processIssues(client, daysBeforeLock, operationsLeft, page = 1) {
         }
         for (var issue of issues.data.values()) {
             core.debug(`Found issue: "${issue.title}", last updated ${issue.updated_at}`);
-            if (wasLastUpdatedBefore(issue, daysBeforeLock)) {
+            if (wasLastUpdatedBefore(issue, daysBeforeLock) && !issue.locked) {
                 operationsLeft -= yield lock(client, issue);
             }
             if (operationsLeft <= 0) {
