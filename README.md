@@ -18,7 +18,7 @@ The Fastlane GitHub Actions provide a set of GitHub Actions to make maintaining 
 
 - 🔒 [@github-actions/lock](lock)
 
-   Locks closed, inactive issues and pull requests after the given number of days. Read more [here](lock).
+   Locks closed issues and pull requests that have not had recent interaction. Read more [here](lock).
 
 ## Versioning 
 
