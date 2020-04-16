@@ -8,7 +8,7 @@ See [action.yml](action.yml)
 
 ```yaml
 steps:
-- uses: fastlane/github-action/fastlane-env-reminder@latest
+- uses: fastlane/github-actions/fastlane-env-reminder@latest
   with:
     repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```
