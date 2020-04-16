@@ -8,7 +8,7 @@ See [action.yml](action.yml)
 
 ```yaml
 steps:
-- uses: fastlane/github-action/communicate-on-pull-request-released@latest
+- uses: fastlane/github-actions/communicate-on-pull-request-released@latest
   with:
     repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```
