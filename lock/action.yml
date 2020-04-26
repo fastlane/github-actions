@@ -1,0 +1,16 @@
+name: 'Lock'
+description: 'An action for locking closed, inactive issues and pull requests'
+author: 'fastlane'
+inputs:
+  repo-token:
+    description: 'Token for the repo. Can be passed in using {{ secrets.GITHUB_TOKEN }}'
+    required: true
+  days-before-lock:
+    description: 'The number of days to wait to lock an issue or pull request after it being closed'
+    default: 60
+  operations-per-run:
+    description: 'The maximum number of operations per run, used to control rate limiting'
+    default: 30
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
