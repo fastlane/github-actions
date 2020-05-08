@@ -16,6 +16,7 @@ jobs:
       run: |
         cd communicate-on-pull-request-merged
         npm install
+        npm run build
         npm test
 
   communicate-on-pull-request-released:
@@ -27,6 +28,7 @@ jobs:
       run: |
         cd communicate-on-pull-request-released
         npm install
+        npm run build
         npm test
 
   fastlane-env-reminder:
@@ -38,6 +40,7 @@ jobs:
       run: |
         cd fastlane-env-reminder
         npm install
+        npm run build
         npm test
         
   lock:
@@ -49,4 +52,5 @@ jobs:
       run: |
         cd lock
         npm install
+        npm run build
         npm test
