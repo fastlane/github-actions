@@ -1,0 +1,52 @@
+name: "Test"
+on: # rebuild any PRs and main branch changes
+  pull_request:
+  push:
+    branches:
+      - master
+      - latest
+      
+jobs:
+  communicate-on-pull-request-merged:
+    name: communicate-on-pull-request-merged
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run tests
+      run: |
+        cd communicate-on-pull-request-merged
+        npm install
+        npm test
+
+  communicate-on-pull-request-released:
+    name: communicate-on-pull-request-released
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run tests
+      run: |
+        cd communicate-on-pull-request-released
+        npm install
+        npm test
+
+  fastlane-env-reminder:
+    name: fastlane-env-reminder
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run tests
+      run: |
+        cd fastlane-env-reminder
+        npm install
+        npm test
+        
+  lock:
+    name: lock
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run tests
+      run: |
+        cd lock
+        npm install
+        npm test
