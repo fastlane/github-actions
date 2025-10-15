@@ -1,6 +1,7 @@
-FROM node:slim
+FROM node:lts-slim
 
-COPY . .
+COPY src /src
+COPY package-lock.json package.json /
 
 RUN npm install --production
 
