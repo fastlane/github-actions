@@ -1,4 +1,4 @@
-name: dist
+name: Update lib/* files
 on:
   push:
     branches:
