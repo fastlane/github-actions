@@ -19,8 +19,7 @@ jobs:
           - lock
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
 
       - uses: actions/setup-node@v6
         with:
