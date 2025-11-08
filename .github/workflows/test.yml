@@ -5,52 +5,76 @@ on: # rebuild any PRs and main branch changes
     branches:
       - master
       - latest
-      
+
 jobs:
   communicate-on-pull-request-merged:
     name: communicate-on-pull-request-merged
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22, 24]
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
     - name: Run tests
       run: |
         cd communicate-on-pull-request-merged
-        npm install
+        npm ci
         npm run build
         npm test
 
   communicate-on-pull-request-released:
     name: communicate-on-pull-request-released
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22, 24]
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
     - name: Run tests
       run: |
         cd communicate-on-pull-request-released
-        npm install
+        npm ci
         npm run build
         npm test
 
   fastlane-env-reminder:
     name: fastlane-env-reminder
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22, 24]
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
     - name: Run tests
       run: |
         cd fastlane-env-reminder
-        npm install
+        npm ci
         npm run build
         npm test
-        
+
   lock:
     name: lock
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22, 24]
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
     - name: Run tests
       run: |
         cd lock
-        npm install
+        npm ci
         npm run build
         npm test
