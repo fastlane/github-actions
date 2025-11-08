@@ -1,0 +1,20 @@
+name: Close PR (if compiled file(s) are touched)
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+    paths:
+      - './communicate-on-pull-request-merged/lib/**'
+      - './communicate-on-pull-request-released/lib/**'
+      - './fastlane-env-reminder/lib/**'
+      - './lock/lib/**'
+
+jobs:
+  test:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Close Pull Request
+        run: |
+          gh pr close ${{ github.event.number }} --comment "Due to security precautions - only the CI system can adapt the compiled (`**/lib/**`) files. Please re-open the PR without these changes." --delete-branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
