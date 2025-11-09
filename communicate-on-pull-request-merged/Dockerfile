@@ -1,7 +1,9 @@
-FROM node:slim
+FROM node:lts-slim
 
-COPY . .
+WORKDIR /app
 
-RUN npm install --production
+COPY . /app
 
-ENTRYPOINT ["node", "/lib/main.js"]
+RUN npm ci --omit=dev
+
+ENTRYPOINT ["node", "/app/lib/main.js"]

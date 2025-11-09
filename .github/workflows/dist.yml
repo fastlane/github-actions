@@ -1,0 +1,40 @@
+name: Update lib/* files
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  update:
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    name: Commit Dist
+    strategy:
+      matrix:
+        repo:
+          - communicate-on-pull-request-merged
+          - communicate-on-pull-request-released
+          - fastlane-env-reminder
+          - lock
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache-dependency-path: ./${{ matrix.repo }}/package-lock.json
+          cache: 'npm'
+
+      - run: npm ci
+        working-directory: ${{ matrix.repo }}
+
+      - run: npm run build
+        working-directory: ${{ matrix.repo }}
+
+      - name: Commit dist files
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "chore: upgrade dist files for ${{ matrix.repo }}"
+          file_pattern: ./${{ matrix.repo }}/lib/**

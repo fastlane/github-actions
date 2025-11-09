@@ -34,7 +34,7 @@ describe('action test suite', () => {
   it(`It does not lock an issue, when the required time has not passed`, async () => {
     process.env['INPUT_REPO-TOKEN'] = 'token';
     process.env['INPUT_DAYS-BEFORE-LOCK'] = '60';
-    process.env['INPUT_OPERATIONS-PER-RUN'] = '2';
+    process.env['INPUT_OPERATIONS-PER-RUN'] = '1';
 
     process.env['GITHUB_REPOSITORY'] = 'foo/bar';
 
@@ -63,7 +63,7 @@ describe('action test suite', () => {
   it(`It does not lock an issue, when the issue is already locked`, async () => {
     process.env['INPUT_REPO-TOKEN'] = 'token';
     process.env['INPUT_DAYS-BEFORE-LOCK'] = '60';
-    process.env['INPUT_OPERATIONS-PER-RUN'] = '2';
+    process.env['INPUT_OPERATIONS-PER-RUN'] = '1';
 
     process.env['GITHUB_REPOSITORY'] = 'foo/bar';
 

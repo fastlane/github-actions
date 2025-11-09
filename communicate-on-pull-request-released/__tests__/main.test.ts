@@ -1,27 +1,14 @@
 const path = require('path');
 const nock = require('nock');
 
-const validScenarios = [
-  {
-    response: 'release.json',
-    event_name: 'release'
-  }
-];
-
-const invalidScenarios = [
-  {
-    response: 'pull-request-closed.json'
-  },
-  {
-    response: 'action-created.json'
-  },
-  {
-    response: 'release-missing-pr-numbers.json',
-    event_name: 'release'
-  }
-];
-
 describe('action test suite', () => {
+  const validScenarios = [
+    {
+      response: 'release.json',
+      event_name: 'release'
+    }
+  ];
+  
   for (const scenario of validScenarios) {
     it(`It posts a comment on pull requests, referenced issues and update labels for (${scenario.response})`, async () => {
       process.env['INPUT_REPO-TOKEN'] = 'token';
@@ -63,6 +50,19 @@ describe('action test suite', () => {
 });
 
 describe('action test suite', () => {
+  const invalidScenarios = [
+    {
+      response: 'pull-request-closed.json'
+    },
+    {
+      response: 'action-created.json'
+    },
+    {
+      response: 'release-missing-pr-numbers.json',
+      event_name: 'release'
+    }
+  ];
+  
   for (const scenario of invalidScenarios) {
     it(`It does not post a comment on pull requests, referenced issues and does not update labels for (${scenario.response})`, async () => {
       process.env['INPUT_REPO-TOKEN'] = 'token';
