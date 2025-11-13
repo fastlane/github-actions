@@ -2,6 +2,8 @@ name: Close PR (if compiled file(s) are touched)
 
 on:
   pull_request_target:
+    branches:
+      - master
     types: [opened, reopened, synchronize]
     paths:
       - 'communicate-on-pull-request-merged/lib/**'
