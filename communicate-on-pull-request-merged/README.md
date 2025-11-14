@@ -11,7 +11,7 @@ steps:
 - uses: fastlane/github-actions/communicate-on-pull-request-merged@latest
   with:
     repo-token: ${{ secrets.GITHUB_TOKEN }}
-    pr-comment: "Hey @${{ github.event.pull_request.user.login }} :wave: Thank you for your contribution!"
+    pr-comment: "Hey :wave: Thank you for your contribution!"
 ```
 
 # License
