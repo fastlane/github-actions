@@ -20,21 +20,22 @@ const github = __importStar(require("@actions/github"));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const isPullRequest = !!github.context.payload.pull_request;
-            if (!isPullRequest) {
-                console.log('The event that triggered this action was not a pull request, exiting');
-                return;
-            }
-            if (github.context.payload.action !== 'closed') {
-                console.log('No pull request was closed, exiting');
+            if (github.context.eventName !== 'push') {
+                console.log('The event that triggered this action was not a push, exiting');
                 return;
             }
             const repoToken = core.getInput('repo-token', { required: true });
             const client = new github.GitHub(repoToken);
-            const prNumber = github.context.payload.pull_request.number;
-            const merged = github.context.payload.pull_request['merged'];
-            if (!merged) {
-                console.log('No pull request was merged, exiting');
+            const commit = yield getCommit(client, github.context.sha);
+            if (!isMergeCommit(commit)) {
+                console.log('No merge commit, exiting');
+                return;
+            }
+            const { data: [pullRequest] } = yield getPullRequests(client, github.context.sha);
+            const prNumber = pullRequest.number;
+            const closed = pullRequest.state == 'closed';
+            if (!closed) {
+                console.log('No pull request was closed, exiting');
                 return;
             }
             const labelToRemove = core.getInput('pr-label-to-remove');
@@ -43,7 +44,11 @@ function run() {
                 yield removeLabel(client, prNumber, labelToRemove);
             }
             yield addLabels(client, prNumber, [core.getInput('pr-label-to-add')]);
-            yield addComment(client, prNumber, core.getInput('pr-comment', { required: true }));
+            var comment = core.getInput('pr-comment', { required: false });
+            if (comment.length == 0) {
+                comment = defaultPrComment(pullRequest.user.login);
+            }
+            yield addComment(client, prNumber, comment);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -51,6 +56,27 @@ function run() {
     });
 }
 exports.run = run;
+function getCommit(client, commit_sha) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield client.git.getCommit({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            commit_sha: commit_sha
+        });
+    });
+}
+function isMergeCommit(commit) {
+    return commit.data.parents.length > 1;
+}
+function getPullRequests(client, commit_sha) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield client.repos.listPullRequestsAssociatedWithCommit({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            commit_sha: commit_sha
+        });
+    });
+}
 function addComment(client, prNumber, comment) {
     return __awaiter(this, void 0, void 0, function* () {
         yield client.pulls.createReview({
@@ -97,5 +123,15 @@ function removeLabel(client, prNumber, label) {
             name: label
         });
     });
+}
+function defaultPrComment(prAuthor) {
+    return `Hey @${prAuthor} :wave:
+                   
+  Thank you for your contribution to _fastlane_ and congrats on getting this pull request merged :tada:
+  The code change now lives in the \`master\` branch, however it wasn't released to [RubyGems](https://rubygems.org/gems/fastlane) yet.
+  We usually ship about once a week, and your PR will be included in the next one.
+  
+  Please let us know if this change requires an immediate release by adding a comment here :+1:
+  We'll notify you once we shipped a new release with your changes :rocket:`;
 }
 run();
