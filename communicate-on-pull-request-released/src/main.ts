@@ -27,10 +27,10 @@ export async function run() {
     }
 
     if (!release) {
-      console.log(
+      core.setFailed(
         `No release found matching name '${versionInput} Improvements' and no usable payload available, exiting`
       );
-      return;
+      return 1;
     }
 
     const prNumbers = releaseParser.getReferencedPullRequests(release.body);

@@ -24,6 +24,7 @@ describe('release lookup via GitHub Releases API', () => {
     ];
 
     const api = nock('https://api.github.com')
+      .persist()
       .get('/repos/foo/bar/releases')
       .query({per_page: 100})
       .reply(200, releases)
@@ -54,7 +55,8 @@ describe('release lookup via GitHub Releases API', () => {
       )
       .reply(200);
 
-    require('../src/main');
+    const main = require('../src/main');
+    await main.run();
 
     expect(api.isDone()).toBeTruthy();
   });
@@ -75,11 +77,13 @@ describe('release lookup via GitHub Releases API', () => {
     ];
 
     const api = nock('https://api.github.com')
+      .persist()
       .get('/repos/foo/bar/releases')
       .query({per_page: 100})
       .reply(200, releases);
 
-    require('../src/main');
+    const main = require('../src/main');
+    await main.run();
 
     expect(api.isDone()).toBeTruthy();
   });

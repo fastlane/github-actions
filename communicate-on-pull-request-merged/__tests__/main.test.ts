@@ -15,13 +15,18 @@ const invalidScenarios = [
     response: 'action-opened.json'
   },
   {
-    response: 'pull-request-closed-but-not-merged'
+    response: 'pull-request-closed-but-not-merged.json'
   }
 ];
 
 describe('action test suite', () => {
+  afterEach(() => {
+    nock.cleanAll();
+  });
+
   for (const scenario of validScenarios) {
     it(`It posts a comment on a merged issue for (${scenario.response})`, async () => {
+      jest.resetModules();
       process.env['INPUT_REPO-TOKEN'] = 'token';
       process.env['INPUT_PR-COMMENT'] = 'message';
       process.env['INPUT_PR-LABEL-TO-ADD'] = 'label-to-add';
@@ -35,13 +40,13 @@ describe('action test suite', () => {
 
       const api = nock('https://api.github.com')
         .persist()
+        .get('/repos/foo/bar/issues/10/labels')
+        .reply(200, [])
         .post(
           '/repos/foo/bar/pulls/10/reviews',
           '{"body":"message","event":"COMMENT"}'
         )
         .reply(200)
-        .get('/repos/foo/bar/issues/10/labels')
-        .reply(200, JSON.parse('[]'))
         .post('/repos/foo/bar/issues/10/labels', '{"labels":["label-to-add"]}')
         .reply(200);
 
@@ -54,6 +59,7 @@ describe('action test suite', () => {
 
   for (const scenario of invalidScenarios) {
     it(`It does not post a comment on a closed pull request for (${scenario.response})`, async () => {
+      jest.resetModules();
       process.env['INPUT_REPO-TOKEN'] = 'token';
       process.env['INPUT_PR-COMMENT'] = 'message';
       process.env['INPUT_PR-LABEL-TO-ADD'] = 'label-to-add';
@@ -66,7 +72,6 @@ describe('action test suite', () => {
       );
 
       const api = nock('https://api.github.com')
-        .persist()
         .post(
           '/repos/foo/bar/pulls/10/reviews',
           '{"body":"message","event":"COMMENT"}'

@@ -23,6 +23,7 @@ describe('action test suite', () => {
       );
 
       const api = nock('https://api.github.com')
+        .persist()
         .post(
           '/repos/foo/bar/pulls/999/reviews',
           '{"body":"Congratulations! :tada: This was released as part of [_fastlane_ 2.134.1](https://github.com/Codertocat/Hello-World/runs/128620228) :rocket:","event":"COMMENT"}'
@@ -40,7 +41,8 @@ describe('action test suite', () => {
         )
         .reply(200);
 
-      require('../src/main');
+      const main = require('../src/main');
+      await main.run();
 
       expect(api.isDone()).toBeTruthy();
     });
@@ -78,7 +80,8 @@ describe('action test suite', () => {
         .post('/repos/foo/bar/issues/10/labels', '{"labels":["label-to-add"]}')
         .reply(200);
 
-      require('../src/main');
+      const main = require('../src/main');
+      await main.run();
 
       expect(api.isDone()).not.toBeTruthy();
     });
