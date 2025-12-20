@@ -77,7 +77,6 @@ describe('release lookup via GitHub Releases API', () => {
     ];
 
     const api = nock('https://api.github.com')
-      .persist()
       .get('/repos/foo/bar/releases')
       .query({per_page: 100})
       .reply(200, releases);
