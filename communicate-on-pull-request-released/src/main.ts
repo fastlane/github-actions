@@ -211,7 +211,4 @@ async function resolveReleaseByVersion(
   }
 }
 
-/* istanbul ignore next */
-if (process.env.NODE_ENV !== 'test') {
-  run();
-}
+run();
