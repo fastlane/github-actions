@@ -11,12 +11,15 @@ interface Release {
 
 export async function run() {
   try {
-    const versionInput = core.getInput('version', {required: true});
+    const versionInput = core.getInput('version', {required: false});
     const repoToken = core.getInput('repo-token', {required: true});
     const client: github.GitHub = new github.GitHub(repoToken);
 
     let release: Release | undefined;
-    release = await resolveReleaseByVersion(client, versionInput);
+    if (versionInput) {
+      console.log(`Resolving release for version '${versionInput}'`);
+      release = await resolveReleaseByVersion(client, versionInput);
+    }
 
     // Fallback to release payload when available (e.g., on release: published)
     if (!release && github.context.eventName === 'release' && github.context.payload.action === 'published') {

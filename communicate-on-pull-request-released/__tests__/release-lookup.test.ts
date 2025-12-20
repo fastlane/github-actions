@@ -75,7 +75,6 @@ describe('release lookup via GitHub Releases API', () => {
       {name: '3.0.0 Improvements'}
     ];
 
-    // Only listReleases is expected; no PR/issue endpoints should be called
     const api = nock('https://api.github.com')
       .get('/repos/foo/bar/releases')
       .query({per_page: 100})

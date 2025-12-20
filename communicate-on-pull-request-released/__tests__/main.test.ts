@@ -8,11 +8,10 @@ describe('action test suite', () => {
       event_name: 'release'
     }
   ];
-  
+
   for (const scenario of validScenarios) {
     it(`It posts a comment on pull requests, referenced issues and update labels for (${scenario.response})`, async () => {
       process.env['INPUT_REPO-TOKEN'] = 'token';
-      process.env['INPUT_VERSION'] = '2.134.1';
       process.env['INPUT_PR-LABEL-TO-ADD'] = 'label-to-add';
       process.env['INPUT_PR-LABEL-TO-REMOVE'] = 'label-to-remove';
 
@@ -63,11 +62,10 @@ describe('action test suite', () => {
       event_name: 'release'
     }
   ];
-  
+
   for (const scenario of invalidScenarios) {
     it(`It does not post a comment on pull requests, referenced issues and does not update labels for (${scenario.response})`, async () => {
       process.env['INPUT_REPO-TOKEN'] = 'token';
-      process.env['INPUT_VERSION'] = '0.0.0';
       process.env['INPUT_PR-LABEL-TO-ADD'] = 'label-to-add';
       process.env['INPUT_PR-LABEL-TO-REMOVE'] = 'label-to-remove';
 
@@ -78,22 +76,15 @@ describe('action test suite', () => {
       );
       process.env['GITHUB_EVENT_NAME'] = scenario.event_name;
 
-      // The action will always attempt to resolve the release by version first.
-      // Mock the Releases API to return entries that DO NOT match `${version} Improvements`.
-      const releases = [
-        {name: '1.2.3 Improvements'},
-        {name: '2.0.0 Improvements'}
-      ];
       const api = nock('https://api.github.com')
-        .get('/repos/foo/bar/releases')
-        .query({per_page: 100})
-        .reply(200, releases);
+        .persist()
+        .post('/repos/foo/bar/issues/10/labels', '{"labels":["label-to-add"]}')
+        .reply(200);
 
       const main = require('../src/main');
       await main.run();
 
-      // Only the releases listing should have been called; no other side effects expected
-      expect(api.isDone()).toBeTruthy();
+      expect(api.isDone()).not.toBeTruthy();
     });
   }
 });
