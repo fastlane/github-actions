@@ -185,8 +185,8 @@ async function resolveReleaseByVersion(
 
     const expectedName = `${version} Improvements`;
 
-    const match = (response.data as any[]).find(r => {
-      const name = (r && (r.name || r.tag_name || '')) as string;
+    const match = (response.data).find(r => {
+      const name = (r && (r.name || r.tag_name || ''));
       return name === expectedName;
     });
 
@@ -194,9 +194,9 @@ async function resolveReleaseByVersion(
       return undefined;
     }
 
-    const body = (match as any).body;
-    const htmlURL = (match as any).html_url || (match as any).htmlUrl;
-    const tag = (match as any).tag_name || (match as any).tagName || (match as any).name || version;
+    const body = (match).body;
+    const htmlURL = (match).html_url
+    const tag = (match).tag_name || match.name || version;
     if (body == null || htmlURL == null) {
       return undefined;
     }

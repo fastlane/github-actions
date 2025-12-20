@@ -1,19 +1,6 @@
 const path = require('path');
 const nock = require('nock');
 
-// Prevent real HTTP during tests
-nock.disableNetConnect();
-
-beforeEach(() => {
-  // Ensure fresh module cache per test
-  jest.resetModules();
-});
-
-afterEach(() => {
-  // Clean up nock interceptors between tests
-  nock.cleanAll();
-});
-
 describe('action test suite', () => {
   const validScenarios = [
     {

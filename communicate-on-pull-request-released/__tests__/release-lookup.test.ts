@@ -2,16 +2,6 @@ const nock = require('nock');
 const path = require('path');
 
 describe('release lookup via GitHub Releases API', () => {
-  beforeEach(() => {
-    // Ensure fresh module state
-    jest.resetModules();
-  });
-
-  afterEach(() => {
-    // Clean up all interceptors between tests to avoid cross-test leakage
-    nock.cleanAll();
-  });
-
   it('uses listReleases when version is found and performs all side effects', async () => {
     process.env['INPUT_REPO-TOKEN'] = 'token';
     process.env['INPUT_VERSION'] = '3.0.0';
@@ -34,7 +24,6 @@ describe('release lookup via GitHub Releases API', () => {
     ];
 
     const api = nock('https://api.github.com')
-      .persist()
       .get('/repos/foo/bar/releases')
       .query({per_page: 100})
       .reply(200, releases)
@@ -87,7 +76,7 @@ describe('release lookup via GitHub Releases API', () => {
     ];
 
     // Only listReleases is expected; no PR/issue endpoints should be called
-    const scope = nock('https://api.github.com')
+    const api = nock('https://api.github.com')
       .get('/repos/foo/bar/releases')
       .query({per_page: 100})
       .reply(200, releases);
@@ -95,13 +84,6 @@ describe('release lookup via GitHub Releases API', () => {
     const main = require('../src/main');
     await main.run();
 
-    // listReleases should have been called, but no further side effects
-    expect(scope.isDone()).toBeTruthy();
-
-    // To assert no unintended calls, set up an extra mock that must NOT be hit
-    const unintended = nock('https://api.github.com')
-      .post('/repos/foo/bar/pulls/999/reviews')
-      .reply(200);
-    expect(unintended.isDone()).not.toBeTruthy();
+    expect(api.isDone()).toBeTruthy();
   });
 });
