@@ -41,7 +41,7 @@ describe('action test suite', () => {
         )
         .reply(200)
         .get('/repos/foo/bar/issues/10/labels')
-        .reply(200, [])
+        .reply(200, JSON.parse('[]'))
         .post('/repos/foo/bar/issues/10/labels', '{"labels":["label-to-add"]}')
         .reply(200);
 
