@@ -54,8 +54,7 @@ describe('release lookup via GitHub Releases API', () => {
       )
       .reply(200);
 
-    const main = require('../src/main');
-    await main.run();
+    require('../src/main');
 
     expect(api.isDone()).toBeTruthy();
   });
@@ -80,8 +79,7 @@ describe('release lookup via GitHub Releases API', () => {
       .query({per_page: 100})
       .reply(200, releases);
 
-    const main = require('../src/main');
-    await main.run();
+    require('../src/main');
 
     expect(api.isDone()).toBeTruthy();
   });
