@@ -197,9 +197,9 @@ async function resolveReleaseByVersion(
       return undefined;
     }
 
-    const body = (match).body;
-    const htmlURL = (match).html_url
-    const tag = (match).tag_name || match.name || version;
+    const body = match.body;
+    const htmlURL = match.html_url
+    const tag = match.tag_name || match.name || version;
     if (body == null || htmlURL == null) {
       return undefined;
     }
