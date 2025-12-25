@@ -8,7 +8,7 @@ describe('action test suite', () => {
       event_name: 'release'
     }
   ];
-  
+
   for (const scenario of validScenarios) {
     it(`It posts a comment on pull requests, referenced issues and update labels for (${scenario.response})`, async () => {
       process.env['INPUT_REPO-TOKEN'] = 'token';
@@ -62,7 +62,7 @@ describe('action test suite', () => {
       event_name: 'release'
     }
   ];
-  
+
   for (const scenario of invalidScenarios) {
     it(`It does not post a comment on pull requests, referenced issues and does not update labels for (${scenario.response})`, async () => {
       process.env['INPUT_REPO-TOKEN'] = 'token';
@@ -77,7 +77,6 @@ describe('action test suite', () => {
       process.env['GITHUB_EVENT_NAME'] = scenario.event_name;
 
       const api = nock('https://api.github.com')
-        .persist()
         .post('/repos/foo/bar/issues/10/labels', '{"labels":["label-to-add"]}')
         .reply(200);
 

@@ -15,7 +15,7 @@ const invalidScenarios = [
     response: 'action-opened.json'
   },
   {
-    response: 'pull-request-closed-but-not-merged'
+    response: 'pull-request-closed-but-not-merged.json'
   }
 ];
 

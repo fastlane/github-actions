@@ -11,26 +11,27 @@ interface Release {
 
 export async function run() {
   try {
-    if (github.context.eventName !== 'release') {
-      console.log(
-        'The event that triggered this action was not a release, exiting'
-      );
-      return;
-    }
-
-    if (github.context.payload.action !== 'published') {
-      console.log('No release was published, exiting');
-      return;
-    }
-
-    const release = extractReleaseFromPayload();
-    if (typeof release === 'undefined') {
-      console.log('No release metadata found, exiting');
-      return;
-    }
-
+    const versionInput = core.getInput('version', {required: false});
     const repoToken = core.getInput('repo-token', {required: true});
     const client: github.GitHub = new github.GitHub(repoToken);
+
+    let release: Release | undefined;
+    if (versionInput) {
+      console.log(`Resolving release for version '${versionInput}'`);
+      release = await resolveReleaseByVersion(client, versionInput);
+    }
+
+    // Fallback to release payload when available (e.g., on release: published)
+    if (!release && github.context.eventName === 'release' && github.context.payload.action === 'published') {
+      release = extractReleaseFromPayload();
+    }
+
+    if (!release) {
+      core.setFailed(
+        `No release found matching name '${versionInput} Improvements' and no usable payload available, exiting`
+      );
+      return 1;
+    }
 
     const prNumbers = releaseParser.getReferencedPullRequests(release.body);
     for (let prNumber of prNumbers) {
@@ -172,6 +173,42 @@ function extractReleaseFromPayload(): Release | undefined {
   }
 
   return {tag: tag, body: body, htmlURL: htmlURL};
+}
+
+async function resolveReleaseByVersion(
+  client: github.GitHub,
+  version: string
+): Promise<Release | undefined> {
+  try {
+    const response = await client.repos.listReleases({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      per_page: 100
+    });
+
+    const expectedName = `${version} Improvements`;
+
+    const match = (response.data).find(r => {
+      const name = (r && (r.name || r.tag_name || ''));
+      return name === expectedName;
+    });
+
+    if (!match) {
+      return undefined;
+    }
+
+    const body = match.body;
+    const htmlURL = match.html_url
+    const tag = match.tag_name || match.name || version;
+    if (body == null || htmlURL == null) {
+      return undefined;
+    }
+
+    return {tag, body, htmlURL};
+  } catch (e) {
+    console.log(`Failed to resolve release by version '${version}': ${e.message || e}`);
+    return undefined;
+  }
 }
 
 run();
