@@ -5,6 +5,9 @@ inputs:
   repo-token:
     description: 'Token for the repo. Can be passed in using {{ secrets.GITHUB_TOKEN }}'
     required: true
+  version:
+    description: 'The version that was released (manual flow)'
+    required: false
   pr-label-to-add:
     description: 'The label to apply when a pull request is released'
     default: 'status: released'

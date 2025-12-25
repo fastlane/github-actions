@@ -59,6 +59,12 @@ describe('pull request parser test suite', () => {
       issueNumber: 10,
       owner: 'foo',
       repo: 'bar'
+    },
+    {
+      prBody: 'fixes: #15',
+      issueNumber: 15,
+      owner: 'foo',
+      repo: 'bar'
     }
   ];
   
@@ -102,6 +108,11 @@ describe('pull request parser test suite', () => {
       prBody: 'This pull request closes https://github.com/foo/bar/issues/10',
       owner: 'foo',
       repo: 'foo'
+    },
+    {
+      prBody: null,
+      owner: 'foo',
+      repo: 'bar'
     }
   ];
   

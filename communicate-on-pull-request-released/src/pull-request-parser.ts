@@ -8,7 +8,10 @@ let ISSUE_CLOSING_KEYWORDS = [
   'fixed',
   'resolve',
   'resolves',
-  'resolved'
+  'resolved',
+  'fixed:',
+  'fixes:',
+  'fix:',
 ];
 
 export function getReferencedIssue(
@@ -16,6 +19,9 @@ export function getReferencedIssue(
   repo: string,
   prBody: string
 ): number | undefined {
+  if (!prBody || prBody.trim() === '') {
+    return undefined;
+  }
   // Searching for issue closing keywords and issue identifier in pull request's description,
   // i.e. `fixes #1234`, `close #444`, `resolved #1`
   var regex = new RegExp(`(${ISSUE_CLOSING_KEYWORDS.join('|')}) #\\d{1,}`, 'i');
