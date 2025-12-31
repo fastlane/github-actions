@@ -1,8 +1,10 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import {GetResponseDataTypeFromEndpointMethod} from '@octokit/types';
 
 type Octokit = ReturnType<typeof github.getOctokit>;
-type Issue = ReturnType<Octokit['rest']['issues']['get']>;
+type IssueList = GetResponseDataTypeFromEndpointMethod<Octokit['rest']['issues']['listForRepo']>;
+type Issue = IssueList[number];
 
 export async function run(): Promise<void> {
   try {
@@ -14,8 +16,13 @@ export async function run(): Promise<void> {
     });
     await processIssues(client, args.daysBeforeLock, args.operationsPerRun);
   } catch (error) {
-    core.error(error);
-    core.setFailed(error.message);
+    if (error instanceof Error) {
+      core.error(error);
+      core.setFailed(error.message);
+    } else {
+      core.error(String(error));
+      core.setFailed(String(error));
+    }
   }
 }
 
@@ -26,12 +33,8 @@ function getAndValidateArgs(): {
 } {
   const args = {
     repoToken: core.getInput('repo-token', {required: true}),
-    daysBeforeLock: parseInt(
-      core.getInput('days-before-lock', {required: true})
-    ),
-    operationsPerRun: parseInt(
-      core.getInput('operations-per-run', {required: true})
-    )
+    daysBeforeLock: parseInt(core.getInput('days-before-lock', {required: true})),
+    operationsPerRun: parseInt(core.getInput('operations-per-run', {required: true}))
   };
 
   for (const numberInput of ['days-before-lock', 'operations-per-run']) {
@@ -64,9 +67,7 @@ async function processIssues(
   }
 
   for (const issue of issues.data.values()) {
-    core.debug(
-      `Found issue: "${issue.title}", last updated ${issue.updated_at}`
-    );
+    core.debug(`Found issue: "${issue.title}", last updated ${issue.updated_at}`);
 
     if (wasLastUpdatedBefore(issue, daysBeforeLock) && !issue.locked) {
       operationsLeft -= await lock(client, issue);
@@ -82,8 +83,7 @@ async function processIssues(
 
 function wasLastUpdatedBefore(issue: Issue, days: number): boolean {
   const daysInMillis = 1000 * 60 * 60 * 24 * days;
-  const millisSinceLastUpdated =
-    new Date().getTime() - new Date(issue.updated_at).getTime();
+  const millisSinceLastUpdated = new Date().getTime() - new Date(issue.updated_at).getTime();
   return millisSinceLastUpdated >= daysInMillis;
 }
 

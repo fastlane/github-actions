@@ -5,7 +5,8 @@
   "type": "module",
   "description": "An action for locking closed issues and pull requests",
   "scripts": {
-    "build": "tsc",
+    "tsc": "tsc",
+    "build": "ncc build src/main.ts --license licenses.txt -o lib",
     "format": "prettier --write **/*.ts",
     "test": "jest"
   },
@@ -14,7 +15,7 @@
     "fastlane"
   ],
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./lib/index.js"
   },
   "author": "fastlane",
   "license": "MIT",
@@ -24,14 +25,15 @@
     "node-fetch": "^2.7.0"
   },
   "devDependencies": {
+    "@octokit/types": "^16.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
+    "@vercel/ncc": "^0.38.1",
     "jest": "^30.2.0",
     "nock": "^13.5.6",
     "prettier": "^3.7.4",
     "ts-jest": "^29.4.6",
     "ts-jest-resolver": "^2.0.1",
-    "typescript": "^5.9.3",
-    "@vercel/ncc": "^0.38.1"
+    "typescript": "^5.9.3"
   }
 }
