@@ -7,7 +7,11 @@ type Issue = ReturnType<Octokit['rest']['issues']['get']>;
 export async function run(): Promise<void> {
   try {
     const args = getAndValidateArgs();
-    const client = github.getOctokit(args.repoToken);
+    const client = github.getOctokit(args.repoToken, {
+      request: {
+        fetch: require('node-fetch')
+      }
+    });
     await processIssues(client, args.daysBeforeLock, args.operationsPerRun);
   } catch (error) {
     core.error(error);

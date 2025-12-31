@@ -12,5 +12,5 @@ inputs:
     description: 'The maximum number of operations per run, used to control rate limiting'
     default: 30
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: node24
+  main: dist/index.js
