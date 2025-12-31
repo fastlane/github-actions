@@ -6,7 +6,7 @@ export default {
   collectCoverage: true,
   collectCoverageFrom: ['./src/**'],
   coverageDirectory: './coverage',
-  coveragePathIgnorePatterns: ['/node_modules/', '/dist/'],
+  coveragePathIgnorePatterns: ['/node_modules/', '/lib/'],
   coverageReporters: ['json-summary', 'text', 'lcov'],
   extensionsToTreatAsEsm: ['.ts'],
   moduleFileExtensions: ['ts', 'js'],
@@ -16,7 +16,7 @@ export default {
   setupFilesAfterEnv: ['./__tests__/setup.js'],
   testEnvironment: 'node',
   testMatch: ['**/*.test.ts'],
-  testPathIgnorePatterns: ['/dist/', '/node_modules/'],
+  testPathIgnorePatterns: ['/lib/', '/node_modules/'],
   transform: {
     '^.+\\.ts$': [
       'ts-jest',

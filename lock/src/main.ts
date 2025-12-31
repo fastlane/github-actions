@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import {GetResponseDataTypeFromEndpointMethod} from '@octokit/types';
+import fetch from 'node-fetch';
 
 type Octokit = ReturnType<typeof github.getOctokit>;
 type IssueList = GetResponseDataTypeFromEndpointMethod<Octokit['rest']['issues']['listForRepo']>;
@@ -9,11 +10,7 @@ type Issue = IssueList[number];
 export async function run(): Promise<void> {
   try {
     const args = getAndValidateArgs();
-    const client = github.getOctokit(args.repoToken, {
-      request: {
-        fetch: require('node-fetch')
-      }
-    });
+    const client = github.getOctokit(args.repoToken, {request: {fetch}});
     await processIssues(client, args.daysBeforeLock, args.operationsPerRun);
   } catch (error) {
     if (error instanceof Error) {

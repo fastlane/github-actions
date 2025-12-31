@@ -1,5 +1,5 @@
-const nock = require('nock');
-const {run} = require('../src/main');
+import nock from 'nock';
+import {run} from '../src/main.js';
 
 describe('action test suite', () => {
   beforeEach(() => {
