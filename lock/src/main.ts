@@ -1,13 +1,13 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import * as Octokit from '@octokit/rest';
 
-type Issue = Octokit.IssuesListForRepoResponseItem;
+type Octokit = ReturnType<typeof github.getOctokit>;
+type Issue = ReturnType<Octokit['rest']['issues']['get']>;
 
-export async function run() {
+export async function run(): Promise<void> {
   try {
     const args = getAndValidateArgs();
-    const client: github.GitHub = new github.GitHub(args.repoToken);
+    const client = github.getOctokit(args.repoToken);
     await processIssues(client, args.daysBeforeLock, args.operationsPerRun);
   } catch (error) {
     core.error(error);
@@ -30,7 +30,7 @@ function getAndValidateArgs(): {
     )
   };
 
-  for (var numberInput of ['days-before-lock', 'operations-per-run']) {
+  for (const numberInput of ['days-before-lock', 'operations-per-run']) {
     if (isNaN(parseInt(core.getInput(numberInput)))) {
       throw Error(`input ${numberInput} did not parse to a valid integer`);
     }
@@ -40,12 +40,12 @@ function getAndValidateArgs(): {
 }
 
 async function processIssues(
-  client: github.GitHub,
+  client: Octokit,
   daysBeforeLock: number,
   operationsLeft: number,
   page: number = 1
 ): Promise<number> {
-  const issues = await client.issues.listForRepo({
+  const issues = await client.rest.issues.listForRepo({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     state: 'closed',
@@ -59,7 +59,7 @@ async function processIssues(
     return operationsLeft;
   }
 
-  for (var issue of issues.data.values()) {
+  for (const issue of issues.data.values()) {
     core.debug(
       `Found issue: "${issue.title}", last updated ${issue.updated_at}`
     );
@@ -83,10 +83,10 @@ function wasLastUpdatedBefore(issue: Issue, days: number): boolean {
   return millisSinceLastUpdated >= daysInMillis;
 }
 
-async function lock(client: github.GitHub, issue: Issue): Promise<number> {
+async function lock(client: Octokit, issue: Issue): Promise<number> {
   core.debug(`Locking issue "${issue.title}"`);
 
-  await client.issues.lock({
+  await client.rest.issues.lock({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: issue.number,
@@ -95,5 +95,3 @@ async function lock(client: github.GitHub, issue: Issue): Promise<number> {
 
   return 1; // the number of API operations performed
 }
-
-run();

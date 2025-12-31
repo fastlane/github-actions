@@ -24,8 +24,7 @@ describe('action test suite', () => {
       .put('/repos/foo/bar/issues/1347/lock')
       .reply(204);
 
-    const main = require('../src/main');
-    await main.run();
+    require('../src/index');
 
     expect(api.isDone()).toBeTruthy();
     nock.cleanAll();
@@ -53,8 +52,7 @@ describe('action test suite', () => {
       .put('/repos/foo/bar/issues/1347/lock')
       .reply(204);
 
-    const main = require('../src/main');
-    await main.run();
+    require('../src/index');
 
     expect(api.isDone()).not.toBeTruthy();
     nock.cleanAll();
@@ -82,8 +80,7 @@ describe('action test suite', () => {
       .put('/repos/foo/bar/issues/1347/lock')
       .reply(204);
 
-    const main = require('../src/main');
-    await main.run();
+    require('../src/index');
 
     expect(api.isDone()).not.toBeTruthy();
     nock.cleanAll();
