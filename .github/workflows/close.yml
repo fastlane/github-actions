@@ -1,4 +1,7 @@
 name: Close PR (if compiled file(s) are touched)
+permissions:
+  pull-requests: write
+  contents: read
 
 on:
   pull_request_target:
