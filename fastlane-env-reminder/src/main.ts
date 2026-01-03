@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import fetch from 'node-fetch';
 
 export async function run() {
   try {
@@ -7,9 +8,7 @@ export async function run() {
 
     const isIssue: boolean = !!context.payload.issue;
     if (!isIssue) {
-      console.log(
-        'The event that triggered this action was not an issue, exiting'
-      );
+      console.log('The event that triggered this action was not an issue, exiting');
       return;
     }
 
@@ -37,17 +36,19 @@ export async function run() {
     const issueMessage = core.getInput('issue-message');
     const repoToken = core.getInput('repo-token', {required: true});
     const issue: {owner: string; repo: string; number: number} = context.issue;
-    const client: github.GitHub = new github.GitHub(repoToken);
-    await client.issues.createComment({
+    const client = github.getOctokit(repoToken, {request: {fetch}});
+    await client.rest.issues.createComment({
       owner: issue.owner,
       repo: issue.repo,
       issue_number: issue.number,
       body: issueMessage
     });
   } catch (error) {
-    core.setFailed(error.message);
+    if (error instanceof Error) {
+      core.setFailed(error.message);
+    } else {
+      core.setFailed(String(error));
+    }
     return;
   }
 }
-
-run();

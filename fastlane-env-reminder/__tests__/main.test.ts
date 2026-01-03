@@ -1,5 +1,10 @@
-const path = require('path');
-const nock = require('nock');
+import nock from 'nock';
+import * as path from 'path';
+import {fileURLToPath} from 'url';
+import {jest} from '@jest/globals';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const validScenarios = [
   {
@@ -26,6 +31,17 @@ const invalidScenarios = [
 ];
 
 describe('action test suite', () => {
+  beforeEach(async () => {
+    jest.resetModules();
+  });
+
+  afterEach(() => {
+    delete process.env['INPUT_ISSUE-MESSAGE'];
+    delete process.env['INPUT_REPO-TOKEN'];
+    delete process.env['GITHUB_REPOSITORY'];
+    delete process.env['GITHUB_EVENT_PATH'];
+  });
+
   for (const scenario of validScenarios) {
     it(`It posts a comment on an opened issue for (${scenario.response})`, async () => {
       const issueMessage = 'message';
@@ -34,18 +50,14 @@ describe('action test suite', () => {
       process.env['INPUT_REPO-TOKEN'] = repoToken;
 
       process.env['GITHUB_REPOSITORY'] = 'foo/bar';
-      process.env['GITHUB_EVENT_PATH'] = path.join(
-        __dirname,
-        scenario.response
-      );
+      const eventPath = path.join(__dirname, scenario.response);
+      process.env['GITHUB_EVENT_PATH'] = eventPath;
 
-      const api = nock('https://api.github.com')
-        .persist()
-        .post('/repos/foo/bar/issues/10/comments', '{"body":"message"}')
-        .reply(200);
+      const {run} = await import('../src/main.js');
 
-      const main = require('../src/main');
-      await main.run();
+      const api = nock('https://api.github.com').post('/repos/foo/bar/issues/10/comments').reply(200);
+
+      await run();
 
       expect(api.isDone()).toBeTruthy();
     });
@@ -59,18 +71,16 @@ describe('action test suite', () => {
       process.env['INPUT_REPO-TOKEN'] = repoToken;
 
       process.env['GITHUB_REPOSITORY'] = 'foo/bar';
-      process.env['GITHUB_EVENT_PATH'] = path.join(
-        __dirname,
-        scenario.response
-      );
+      const eventPath = path.join(__dirname, scenario.response);
+      process.env['GITHUB_EVENT_PATH'] = eventPath;
+
+      const {run} = await import('../src/main.js');
 
       const api = nock('https://api.github.com')
-        .persist()
         .post('/repos/foo/bar/issues/10/comments', '{"body":"message"}')
         .reply(200);
 
-      const main = require('../src/main');
-      await main.run();
+      await run();
 
       expect(api.isDone()).not.toBeTruthy();
     });
