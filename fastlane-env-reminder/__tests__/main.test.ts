@@ -1,7 +1,6 @@
 import nock from 'nock';
 import * as path from 'path';
 import {fileURLToPath} from 'url';
-import {jest} from '@jest/globals';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,8 +45,7 @@ describe('action test suite', () => {
       process.env['INPUT_REPO-TOKEN'] = repoToken;
 
       process.env['GITHUB_REPOSITORY'] = 'foo/bar';
-      const eventPath = path.join(__dirname, scenario.response);
-      process.env['GITHUB_EVENT_PATH'] = eventPath;
+      process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, scenario.response);
 
       const {run} = await import('../src/main.js');
 
@@ -67,8 +65,7 @@ describe('action test suite', () => {
       process.env['INPUT_REPO-TOKEN'] = repoToken;
 
       process.env['GITHUB_REPOSITORY'] = 'foo/bar';
-      const eventPath = path.join(__dirname, scenario.response);
-      process.env['GITHUB_EVENT_PATH'] = eventPath;
+      process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, scenario.response);
 
       const {run} = await import('../src/main.js');
 
