@@ -1,58 +1,50 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import fetch from 'node-fetch';
 
 export async function run() {
   try {
-    const isPullRequest: boolean = !!github.context.payload.pull_request;
+    const context = github.context;
+    const isPullRequest: boolean = !!context.payload.pull_request;
     if (!isPullRequest) {
-      console.log(
-        'The event that triggered this action was not a pull request, exiting'
-      );
+      console.log('The event that triggered this action was not a pull request, exiting');
       return;
     }
 
-    if (github.context.payload.action !== 'closed') {
+    if (context.payload.action !== 'closed') {
       console.log('No pull request was closed, exiting');
       return;
     }
 
     const repoToken = core.getInput('repo-token', {required: true});
-    const client: github.GitHub = new github.GitHub(repoToken);
-    const prNumber = github.context.payload.pull_request!.number;
+    const client = github.getOctokit(repoToken, {request: {fetch}});
+    const prNumber = context.payload.pull_request!.number;
 
-    const merged = github.context.payload.pull_request!['merged'];
+    const merged = context.payload.pull_request!['merged'];
     if (!merged) {
       console.log('No pull request was merged, exiting');
       return;
     }
 
     const labelToRemove = core.getInput('pr-label-to-remove');
-    const canRemoveLabel = await canRemoveLabelFromIssue(
-      client,
-      prNumber,
-      labelToRemove
-    );
+    const canRemoveLabel = await canRemoveLabelFromIssue(client, prNumber, labelToRemove);
     if (canRemoveLabel) {
       await removeLabel(client, prNumber, labelToRemove);
     }
 
     await addLabels(client, prNumber, [core.getInput('pr-label-to-add')]);
-    await addComment(
-      client,
-      prNumber,
-      core.getInput('pr-comment', {required: true})
-    );
+    await addComment(client, prNumber, core.getInput('pr-comment', {required: true}));
   } catch (error) {
-    core.setFailed(error.message);
+    if (error instanceof Error) {
+      core.setFailed(error.message);
+    } else {
+      core.setFailed(String(error));
+    }
   }
 }
 
-async function addComment(
-  client: github.GitHub,
-  prNumber: number,
-  comment: string
-) {
-  await client.pulls.createReview({
+async function addComment(client: any, prNumber: number, comment: string): Promise<void> {
+  await client.rest.pulls.createReview({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     pull_number: prNumber,
@@ -61,12 +53,8 @@ async function addComment(
   });
 }
 
-async function addLabels(
-  client: github.GitHub,
-  prNumber: number,
-  labels: string[]
-) {
-  await client.issues.addLabels({
+async function addLabels(client: any, prNumber: number, labels: string[]): Promise<void> {
+  await client.rest.issues.addLabels({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: prNumber,
@@ -74,19 +62,15 @@ async function addLabels(
   });
 }
 
-async function canRemoveLabelFromIssue(
-  client: github.GitHub,
-  prNumber: number,
-  label: string
-): Promise<boolean> {
-  const response = await client.issues.listLabelsOnIssue({
+async function canRemoveLabelFromIssue(client: any, prNumber: number, label: string): Promise<boolean> {
+  const response = await client.rest.issues.listLabelsOnIssue({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: prNumber
   });
 
   const issueLabels = response.data;
-  for (let issueLabel of issueLabels) {
+  for (const issueLabel of issueLabels) {
     if (issueLabel.name === label) {
       return true;
     }
@@ -94,17 +78,11 @@ async function canRemoveLabelFromIssue(
   return false;
 }
 
-async function removeLabel(
-  client: github.GitHub,
-  prNumber: number,
-  label: string
-) {
-  await client.issues.removeLabel({
+async function removeLabel(client: any, prNumber: number, label: string): Promise<void> {
+  await client.rest.issues.removeLabel({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: prNumber,
     name: label
   });
 }
-
-run();

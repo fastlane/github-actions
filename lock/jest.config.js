@@ -13,6 +13,7 @@ export default {
   preset: 'ts-jest',
   reporters: ['default'],
   resolver: 'ts-jest-resolver',
+  resetModules: true,
   setupFilesAfterEnv: ['./__tests__/setup.js'],
   testEnvironment: 'node',
   testMatch: ['**/*.test.ts'],

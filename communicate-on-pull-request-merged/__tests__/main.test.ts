@@ -1,5 +1,9 @@
-const path = require('path');
-const nock = require('nock');
+import * as path from 'path';
+import nock from 'nock';
+import {fileURLToPath} from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const validScenarios = [
   {
@@ -28,25 +32,19 @@ describe('action test suite', () => {
       process.env['INPUT_PR-LABEL-TO-REMOVE'] = 'label-to-remove';
 
       process.env['GITHUB_REPOSITORY'] = 'foo/bar';
-      process.env['GITHUB_EVENT_PATH'] = path.join(
-        __dirname,
-        scenario.response
-      );
+      process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, scenario.response);
+
+      const {run} = await import('../src/main.js');
 
       const api = nock('https://api.github.com')
-        .persist()
-        .post(
-          '/repos/foo/bar/pulls/10/reviews',
-          '{"body":"message","event":"COMMENT"}'
-        )
+        .post('/repos/foo/bar/pulls/10/reviews', '{"body":"message","event":"COMMENT"}')
         .reply(200)
         .get('/repos/foo/bar/issues/10/labels')
         .reply(200, JSON.parse('[]'))
         .post('/repos/foo/bar/issues/10/labels', '{"labels":["label-to-add"]}')
         .reply(200);
 
-      const main = require('../src/main');
-      await main.run();
+      await run();
 
       expect(api.isDone()).toBeTruthy();
     });
@@ -60,25 +58,19 @@ describe('action test suite', () => {
       process.env['INPUT_PR-LABEL-TO-REMOVE'] = 'label-to-remove';
 
       process.env['GITHUB_REPOSITORY'] = 'foo/bar';
-      process.env['GITHUB_EVENT_PATH'] = path.join(
-        __dirname,
-        scenario.response
-      );
+      process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, scenario.response);
+
+      const {run} = await import('../src/main.js');
 
       const api = nock('https://api.github.com')
-        .persist()
-        .post(
-          '/repos/foo/bar/pulls/10/reviews',
-          '{"body":"message","event":"COMMENT"}'
-        )
+        .post('/repos/foo/bar/pulls/10/reviews', '{"body":"message","event":"COMMENT"}')
         .reply(200)
         .get('/repos/foo/bar/issues/10/labels')
         .reply(200, JSON.parse('[]'))
         .post('/repos/foo/bar/issues/10/labels', '{"labels":["label-to-add"]}')
         .reply(200);
 
-      const main = require('../src/main');
-      await main.run();
+      await run();
 
       expect(api.isDone()).not.toBeTruthy();
     });
