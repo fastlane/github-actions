@@ -40,4 +40,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore: upgrade dist files for ${{ matrix.repo }}"
-          file_pattern: ./${{ matrix.repo }}/lib/**
+          file_pattern: ./${{ matrix.repo }}/lib/
