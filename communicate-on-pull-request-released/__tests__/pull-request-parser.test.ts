@@ -1,3 +1,5 @@
+import {getReferencedIssue} from '../src/pull-request-parser.js';
+
 describe('pull request parser test suite', () => {
   const validScenarios = [
     {
@@ -67,7 +69,7 @@ describe('pull request parser test suite', () => {
       repo: 'bar'
     }
   ];
-  
+
   const invalidScenarios = [
     {
       prBody: 'This description does not contain referenced issue.',
@@ -110,35 +112,21 @@ describe('pull request parser test suite', () => {
       repo: 'foo'
     },
     {
-      prBody: null,
+      prBody: '',
       owner: 'foo',
       repo: 'bar'
     }
   ];
-  
+
   for (const scenario of validScenarios) {
     it(`It detects referenced issue for (${scenario.prBody})`, async () => {
-      const parser = require('../src/pull-request-parser');
-      expect(
-        parser.getReferencedIssue(
-          scenario.owner,
-          scenario.repo,
-          scenario.prBody
-        )
-      ).toEqual(scenario.issueNumber);
+      expect(getReferencedIssue(scenario.owner, scenario.repo, scenario.prBody)).toEqual(scenario.issueNumber);
     });
   }
 
   for (const scenario of invalidScenarios) {
     it(`It does not detect referenced issue for (${scenario.prBody})`, async () => {
-      const parser = require('../src/pull-request-parser');
-      expect(
-        parser.getReferencedIssue(
-          scenario.owner,
-          scenario.repo,
-          scenario.prBody
-        )
-      ).toBeUndefined();
+      expect(getReferencedIssue(scenario.owner, scenario.repo, scenario.prBody)).toBeUndefined();
     });
   }
 });

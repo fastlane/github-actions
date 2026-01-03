@@ -11,25 +11,21 @@ let ISSUE_CLOSING_KEYWORDS = [
   'resolved',
   'fixed:',
   'fixes:',
-  'fix:',
+  'fix:'
 ];
 
-export function getReferencedIssue(
-  owner: string,
-  repo: string,
-  prBody: string
-): number | undefined {
+export function getReferencedIssue(owner: string, repo: string, prBody: string): number | undefined {
   if (!prBody || prBody.trim() === '') {
     return undefined;
   }
   // Searching for issue closing keywords and issue identifier in pull request's description,
   // i.e. `fixes #1234`, `close #444`, `resolved #1`
-  var regex = new RegExp(`(${ISSUE_CLOSING_KEYWORDS.join('|')}) #\\d{1,}`, 'i');
-  var matched = prBody.match(regex) || [];
-  if (matched.length > 0) {
-    const issue = matched[0].match(/#\d{1,}/i) || [];
-    if (issue.length > 0) {
-      const issueNumber = issue[0].replace('#', '');
+  let regex = new RegExp(`(${ISSUE_CLOSING_KEYWORDS.join('|')}) #\\d{1,}`, 'i');
+  let matched = prBody.match(regex);
+  if (matched && matched.length > 0) {
+    const issueMatch = matched[0].match(/#\d{1,}/i);
+    if (issueMatch && issueMatch.length > 0) {
+      const issueNumber = issueMatch[0].replace('#', '');
       return Number(issueNumber);
     }
   }
@@ -37,13 +33,11 @@ export function getReferencedIssue(
   // Searching for issue closing keywords and issue URL in pull request's description,
   // i.e. `closes https://github.com/REPOSITORY_OWNER/REPOSITORY_NAME/issues/1234`
   regex = new RegExp(
-    `(${ISSUE_CLOSING_KEYWORDS.join(
-      '|'
-    )}) https:\\/\\/github.com\\/${owner}\\/${repo}\\/issues\\/\\d{1,}`,
+    `(${ISSUE_CLOSING_KEYWORDS.join('|')}) https:\\/\\/github.com\\/${owner}\\/${repo}\\/issues\\/\\d{1,}`,
     'i'
   );
-  matched = prBody.match(regex) || [];
-  if (matched.length > 0) {
+  matched = prBody.match(regex);
+  if (matched && matched.length > 0) {
     const issue = matched[0].split('/').pop();
     if (issue) {
       return Number(issue);

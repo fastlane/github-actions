@@ -15,5 +15,5 @@ inputs:
     description: 'The label to remove when a pull request is released'
     default: 'status: included-in-next-release'
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: 'node24'
+  main: 'lib/index.js'
