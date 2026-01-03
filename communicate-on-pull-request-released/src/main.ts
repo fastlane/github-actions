@@ -4,6 +4,8 @@ import * as pullRequestParser from './pull-request-parser.js';
 import * as releaseParser from './release-parser.js';
 import fetch from 'node-fetch';
 
+type Octokit = ReturnType<typeof github.getOctokit>;
+
 interface Release {
   tag: string;
   body: string;
@@ -58,11 +60,7 @@ export async function run() {
   }
 }
 
-async function addCommentToPullRequest(
-  client: ReturnType<typeof github.getOctokit>,
-  prNumber: number,
-  comment: string
-) {
+async function addCommentToPullRequest(client: Octokit, prNumber: number, comment: string) {
   await client.rest.pulls.createReview({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
@@ -72,11 +70,7 @@ async function addCommentToPullRequest(
   });
 }
 
-async function addCommentToReferencedIssue(
-  client: ReturnType<typeof github.getOctokit>,
-  prNumber: number,
-  release: Release
-) {
+async function addCommentToReferencedIssue(client: Octokit, prNumber: number, release: Release) {
   const pullRequest = await getPullRequest(client, prNumber);
   if (pullRequest.body) {
     const issueNumber = pullRequestParser.getReferencedIssue(
@@ -94,7 +88,7 @@ async function addCommentToReferencedIssue(
   }
 }
 
-async function getPullRequest(client: ReturnType<typeof github.getOctokit>, prNumber: number) {
+async function getPullRequest(client: Octokit, prNumber: number) {
   const response = await client.rest.pulls.get({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
@@ -103,11 +97,7 @@ async function getPullRequest(client: ReturnType<typeof github.getOctokit>, prNu
   return response.data;
 }
 
-async function canRemoveLabelFromIssue(
-  client: ReturnType<typeof github.getOctokit>,
-  prNumber: number,
-  label: string
-): Promise<boolean> {
+async function canRemoveLabelFromIssue(client: Octokit, prNumber: number, label: string): Promise<boolean> {
   const response = await client.rest.issues.listLabelsOnIssue({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
@@ -123,7 +113,7 @@ async function canRemoveLabelFromIssue(
   return false;
 }
 
-async function addLabels(client: ReturnType<typeof github.getOctokit>, prNumber: number, labels: string[]) {
+async function addLabels(client: Octokit, prNumber: number, labels: string[]) {
   await client.rest.issues.addLabels({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
@@ -132,7 +122,7 @@ async function addLabels(client: ReturnType<typeof github.getOctokit>, prNumber:
   });
 }
 
-async function removeLabel(client: ReturnType<typeof github.getOctokit>, prNumber: number, label: string) {
+async function removeLabel(client: Octokit, prNumber: number, label: string) {
   await client.rest.issues.removeLabel({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
@@ -141,7 +131,7 @@ async function removeLabel(client: ReturnType<typeof github.getOctokit>, prNumbe
   });
 }
 
-async function addIssueComment(client: ReturnType<typeof github.getOctokit>, issueNumber: number, message: string) {
+async function addIssueComment(client: Octokit, issueNumber: number, message: string) {
   await client.rest.issues.createComment({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
@@ -166,10 +156,7 @@ function extractReleaseFromPayload(): Release | undefined {
   return {tag: tag, body: body, htmlURL: htmlURL};
 }
 
-async function resolveReleaseByVersion(
-  client: ReturnType<typeof github.getOctokit>,
-  version: string
-): Promise<Release | undefined> {
+async function resolveReleaseByVersion(client: Octokit, version: string): Promise<Release | undefined> {
   try {
     const response = await client.rest.repos.listReleases({
       owner: github.context.repo.owner,
