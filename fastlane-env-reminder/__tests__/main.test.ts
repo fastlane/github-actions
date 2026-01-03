@@ -31,10 +31,6 @@ const invalidScenarios = [
 ];
 
 describe('action test suite', () => {
-  beforeEach(async () => {
-    jest.resetModules();
-  });
-
   afterEach(() => {
     delete process.env['INPUT_ISSUE-MESSAGE'];
     delete process.env['INPUT_REPO-TOKEN'];
