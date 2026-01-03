@@ -1,5 +1,8 @@
 name: "Test"
-on: # rebuild any PRs and main branch changes
+permissions:
+  contents: read
+
+on:
   pull_request:
   push:
     branches:
