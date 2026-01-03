@@ -30,7 +30,7 @@ jobs:
       - run: npm ci
         working-directory: ${{ matrix.repo }}
 
-      - run: rm -rf ./${{ matrix.repo }}/lib/*
+      - run: rm -rf lib/*
         working-directory: ${{ matrix.repo }}
 
       - run: npm run build
