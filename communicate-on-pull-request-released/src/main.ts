@@ -1,7 +1,8 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import * as pullRequestParser from './pull-request-parser';
-import * as releaseParser from './release-parser';
+import * as pullRequestParser from './pull-request-parser.js';
+import * as releaseParser from './release-parser.js';
+import fetch from 'node-fetch';
 
 interface Release {
   tag: string;
@@ -11,9 +12,9 @@ interface Release {
 
 export async function run() {
   try {
-    const versionInput = core.getInput('version', {required: false});
     const repoToken = core.getInput('repo-token', {required: true});
-    const client: github.GitHub = new github.GitHub(repoToken);
+    const versionInput = core.getInput('version', {required: false});
+    const client = github.getOctokit(repoToken, {request: {fetch}});
 
     let release: Release | undefined;
     if (versionInput) {
@@ -30,22 +31,18 @@ export async function run() {
       core.setFailed(
         `No release found matching name '${versionInput} Improvements' and no usable payload available, exiting`
       );
-      return 1;
+      return;
     }
 
     const prNumbers = releaseParser.getReferencedPullRequests(release.body);
-    for (let prNumber of prNumbers) {
+    for (const prNumber of prNumbers) {
       await addCommentToPullRequest(
         client,
         prNumber,
         `Congratulations! :tada: This was released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`
       );
       const labelToRemove = core.getInput('pr-label-to-remove');
-      const canRemoveLabel = await canRemoveLabelFromIssue(
-        client,
-        prNumber,
-        labelToRemove
-      );
+      const canRemoveLabel = await canRemoveLabelFromIssue(client, prNumber, labelToRemove);
       if (canRemoveLabel) {
         await removeLabel(client, prNumber, labelToRemove);
       }
@@ -53,16 +50,20 @@ export async function run() {
       await addCommentToReferencedIssue(client, prNumber, release);
     }
   } catch (error) {
-    core.setFailed(error.message);
+    if (error instanceof Error) {
+      core.setFailed(error.message);
+    } else {
+      core.setFailed(String(error));
+    }
   }
 }
 
 async function addCommentToPullRequest(
-  client: github.GitHub,
+  client: ReturnType<typeof github.getOctokit>,
   prNumber: number,
   comment: string
 ) {
-  await client.pulls.createReview({
+  await client.rest.pulls.createReview({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     pull_number: prNumber,
@@ -72,27 +73,29 @@ async function addCommentToPullRequest(
 }
 
 async function addCommentToReferencedIssue(
-  client: github.GitHub,
+  client: ReturnType<typeof github.getOctokit>,
   prNumber: number,
   release: Release
 ) {
   const pullRequest = await getPullRequest(client, prNumber);
-  const issueNumber = pullRequestParser.getReferencedIssue(
-    github.context.repo.owner,
-    github.context.repo.repo,
-    pullRequest.body
-  );
-  if (issueNumber) {
-    const message = [
-      `The pull request #${prNumber} that closed this issue was merged and released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`,
-      `Please let us know if the functionality works as expected as a reply here. If it does not, please open a new issue. Thanks!`
-    ];
-    await addIssueComment(client, issueNumber, message.join('\n'));
+  if (pullRequest.body) {
+    const issueNumber = pullRequestParser.getReferencedIssue(
+      github.context.repo.owner,
+      github.context.repo.repo,
+      pullRequest.body
+    );
+    if (issueNumber) {
+      const message = [
+        `The pull request #${prNumber} that closed this issue was merged and released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`,
+        `Please let us know if the functionality works as expected as a reply here. If it does not, please open a new issue. Thanks!`
+      ];
+      await addIssueComment(client, issueNumber, message.join('\n'));
+    }
   }
 }
 
-async function getPullRequest(client: github.GitHub, prNumber: number) {
-  const response = await client.pulls.get({
+async function getPullRequest(client: ReturnType<typeof github.getOctokit>, prNumber: number) {
+  const response = await client.rest.pulls.get({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     pull_number: prNumber
@@ -101,18 +104,18 @@ async function getPullRequest(client: github.GitHub, prNumber: number) {
 }
 
 async function canRemoveLabelFromIssue(
-  client: github.GitHub,
+  client: ReturnType<typeof github.getOctokit>,
   prNumber: number,
   label: string
 ): Promise<boolean> {
-  const response = await client.issues.listLabelsOnIssue({
+  const response = await client.rest.issues.listLabelsOnIssue({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: prNumber
   });
 
   const issueLabels = response.data;
-  for (let issueLabel of issueLabels) {
+  for (const issueLabel of issueLabels) {
     if (issueLabel.name === label) {
       return true;
     }
@@ -120,12 +123,8 @@ async function canRemoveLabelFromIssue(
   return false;
 }
 
-async function addLabels(
-  client: github.GitHub,
-  prNumber: number,
-  labels: string[]
-) {
-  await client.issues.addLabels({
+async function addLabels(client: ReturnType<typeof github.getOctokit>, prNumber: number, labels: string[]) {
+  await client.rest.issues.addLabels({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: prNumber,
@@ -133,12 +132,8 @@ async function addLabels(
   });
 }
 
-async function removeLabel(
-  client: github.GitHub,
-  prNumber: number,
-  label: string
-) {
-  await client.issues.removeLabel({
+async function removeLabel(client: ReturnType<typeof github.getOctokit>, prNumber: number, label: string) {
+  await client.rest.issues.removeLabel({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: prNumber,
@@ -146,12 +141,8 @@ async function removeLabel(
   });
 }
 
-async function addIssueComment(
-  client: github.GitHub,
-  issueNumber: number,
-  message: string
-) {
-  await client.issues.createComment({
+async function addIssueComment(client: ReturnType<typeof github.getOctokit>, issueNumber: number, message: string) {
+  await client.rest.issues.createComment({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: issueNumber,
@@ -161,7 +152,7 @@ async function addIssueComment(
 
 function extractReleaseFromPayload(): Release | undefined {
   const release = github.context.payload['release'];
-  if (release === 'undefined') {
+  if (!release) {
     return undefined;
   }
 
@@ -176,11 +167,11 @@ function extractReleaseFromPayload(): Release | undefined {
 }
 
 async function resolveReleaseByVersion(
-  client: github.GitHub,
+  client: ReturnType<typeof github.getOctokit>,
   version: string
 ): Promise<Release | undefined> {
   try {
-    const response = await client.repos.listReleases({
+    const response = await client.rest.repos.listReleases({
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
       per_page: 100
@@ -188,8 +179,8 @@ async function resolveReleaseByVersion(
 
     const expectedName = `${version} Improvements`;
 
-    const match = (response.data).find(r => {
-      const name = (r && (r.name || r.tag_name || ''));
+    const match = response.data.find(r => {
+      const name = r && (r.name || r.tag_name || '');
       return name === expectedName;
     });
 
@@ -198,7 +189,7 @@ async function resolveReleaseByVersion(
     }
 
     const body = match.body;
-    const htmlURL = match.html_url
+    const htmlURL = match.html_url;
     const tag = match.tag_name || match.name || version;
     if (body == null || htmlURL == null) {
       return undefined;
@@ -206,7 +197,7 @@ async function resolveReleaseByVersion(
 
     return {tag, body, htmlURL};
   } catch (e) {
-    console.log(`Failed to resolve release by version '${version}': ${e.message || e}`);
+    console.log(`Failed to resolve release by version '${version}': ${e instanceof Error ? e.message : e}`);
     return undefined;
   }
 }

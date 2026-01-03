@@ -1,13 +1,28 @@
-module.exports = {
+/** @type {import('ts-jest').JestConfigWithTsJest} **/
+export default {
   clearMocks: true,
-  moduleFileExtensions: ['js', 'ts'],
-  resetModules: true,
+  collectCoverage: true,
+  collectCoverageFrom: ['./src/**'],
+  coverageDirectory: './coverage',
+  coveragePathIgnorePatterns: ['/node_modules/', '/lib/'],
+  coverageReporters: ['json-summary', 'text', 'lcov'],
+  extensionsToTreatAsEsm: ['.ts'],
+  moduleFileExtensions: ['ts', 'js'],
+  preset: 'ts-jest',
+  reporters: ['default'],
+  resolver: 'ts-jest-resolver',
+  setupFilesAfterEnv: ['./__tests__/setup.js'],
   testEnvironment: 'node',
   testMatch: ['**/*.test.ts'],
-  testRunner: 'jest-circus/runner',
-  setupFilesAfterEnv: ['./__tests__/setup.js'],
+  testPathIgnorePatterns: ['/lib/', '/node_modules/'],
   transform: {
-    '^.+\\.ts$': 'ts-jest'
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.json',
+        useESM: true
+      }
+    ]
   },
   verbose: true
-}
+};

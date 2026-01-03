@@ -13,9 +13,7 @@ export function getReferencedPullRequests(releaseBody: string): number[] {
     const matches = line.match(regex) || [];
     if (matches.length >= 2) {
       const rawPullRequestNumbers = matches[1].split(/,\s*/) || [];
-      var numbers = rawPullRequestNumbers.map(rawNumber =>
-        Number(rawNumber.replace('#', ''))
-      );
+      var numbers = rawPullRequestNumbers.map(rawNumber => Number(rawNumber.replace('#', '')));
       pullRequestNumbers.push(...numbers);
     }
   });

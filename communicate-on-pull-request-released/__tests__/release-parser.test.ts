@@ -1,8 +1,9 @@
+import {getReferencedPullRequests} from '../src/release-parser.js';
+
 describe('release parser test suite', () => {
   const validScenarios = [
     {
-      releaseBody:
-        '[action] cocoapods changes (#15490) via XYZ\n[fastlane] revert (#15399, #15407) via ZYX',
+      releaseBody: '[action] cocoapods changes (#15490) via XYZ\n[fastlane] revert (#15399, #15407) via ZYX',
       issues: [15490, 15399, 15407]
     },
     {
@@ -29,16 +30,14 @@ describe('release parser test suite', () => {
 
   for (const scenario of validScenarios) {
     it(`It detects the list of pull requests for (${scenario.releaseBody})`, async () => {
-      const parser = require('../src/release-parser');
-      let pullRequests = parser.getReferencedPullRequests(scenario.releaseBody);
+      const pullRequests = getReferencedPullRequests(scenario.releaseBody);
       expect(pullRequests).toEqual(scenario.issues);
     });
   }
 
   for (const scenario of invalidScenarios) {
     it(`It does not detect the list of pull requests for (${scenario.releaseBody})`, async () => {
-      const parser = require('../src/release-parser');
-      let pullRequests = parser.getReferencedPullRequests(scenario.releaseBody);
+      const pullRequests = getReferencedPullRequests(scenario.releaseBody);
       expect(pullRequests.length).toBe(0);
     });
   }
