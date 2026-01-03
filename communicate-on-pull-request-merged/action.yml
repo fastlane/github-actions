@@ -15,5 +15,5 @@ inputs:
       description: 'The label to remove when a pull request is merged'
       default: 'status: needs-attention'
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: node24
+  main: lib/index.js
