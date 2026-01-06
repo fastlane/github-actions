@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-24.04
     name: Commit Dist
     strategy:
+      max-parallel: 1
       matrix:
         repo:
           - communicate-on-pull-request-merged
