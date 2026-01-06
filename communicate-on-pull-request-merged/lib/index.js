@@ -36689,21 +36689,21 @@ module.exports = /*#__PURE__*/JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45
 /******/ 
 /************************************************************************/
 var __webpack_exports__ = {};
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   e: () => (/* binding */ run)
-/* harmony export */ });
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(7484);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(3228);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_fetch__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(6705);
-/* harmony import */ var node_fetch__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(node_fetch__WEBPACK_IMPORTED_MODULE_2__);
+
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(7484);
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(3228);
+// EXTERNAL MODULE: ./node_modules/node-fetch/lib/index.js
+var lib = __nccwpck_require__(6705);
+var lib_default = /*#__PURE__*/__nccwpck_require__.n(lib);
+;// CONCATENATED MODULE: ./src/main.ts
 
 
 
 async function run() {
     try {
-        const context = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context;
+        const context = github.context;
         const isPullRequest = !!context.payload.pull_request;
         if (!isPullRequest) {
             console.log('The event that triggered this action was not a pull request, exiting');
@@ -36713,35 +36713,35 @@ async function run() {
             console.log('No pull request was closed, exiting');
             return;
         }
-        const repoToken = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('repo-token', { required: true });
-        const client = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(repoToken, { request: { fetch: (node_fetch__WEBPACK_IMPORTED_MODULE_2___default()) } });
+        const repoToken = core.getInput('repo-token', { required: true });
+        const client = github.getOctokit(repoToken, { request: { fetch: (lib_default()) } });
         const prNumber = context.payload.pull_request.number;
         const merged = context.payload.pull_request['merged'];
         if (!merged) {
             console.log('No pull request was merged, exiting');
             return;
         }
-        const labelToRemove = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('pr-label-to-remove');
+        const labelToRemove = core.getInput('pr-label-to-remove');
         const canRemoveLabel = await canRemoveLabelFromIssue(client, prNumber, labelToRemove);
         if (canRemoveLabel) {
             await removeLabel(client, prNumber, labelToRemove);
         }
-        await addLabels(client, prNumber, [_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('pr-label-to-add')]);
-        await addComment(client, prNumber, _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('pr-comment', { required: true }));
+        await addLabels(client, prNumber, [core.getInput('pr-label-to-add')]);
+        await addComment(client, prNumber, core.getInput('pr-comment', { required: true }));
     }
     catch (error) {
         if (error instanceof Error) {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
+            core.setFailed(error.message);
         }
         else {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(String(error));
+            core.setFailed(String(error));
         }
     }
 }
 async function addComment(client, prNumber, comment) {
     await client.rest.pulls.createReview({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
         pull_number: prNumber,
         body: comment,
         event: 'COMMENT'
@@ -36749,16 +36749,16 @@ async function addComment(client, prNumber, comment) {
 }
 async function addLabels(client, prNumber, labels) {
     await client.rest.issues.addLabels({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
         issue_number: prNumber,
         labels: labels
     });
 }
 async function canRemoveLabelFromIssue(client, prNumber, label) {
     const response = await client.rest.issues.listLabelsOnIssue({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
         issue_number: prNumber
     });
     const issueLabels = response.data;
@@ -36771,12 +36771,14 @@ async function canRemoveLabelFromIssue(client, prNumber, label) {
 }
 async function removeLabel(client, prNumber, label) {
     await client.rest.issues.removeLabel({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
         issue_number: prNumber,
         name: label
     });
 }
 
-var __webpack_exports__run = __webpack_exports__.e;
-export { __webpack_exports__run as run };
+;// CONCATENATED MODULE: ./src/index.ts
+
+run();
+
