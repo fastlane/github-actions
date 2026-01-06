@@ -36689,21 +36689,21 @@ module.exports = /*#__PURE__*/JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45
 /******/ 
 /************************************************************************/
 var __webpack_exports__ = {};
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   e: () => (/* binding */ run)
-/* harmony export */ });
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(7484);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(3228);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_fetch__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(6705);
-/* harmony import */ var node_fetch__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(node_fetch__WEBPACK_IMPORTED_MODULE_2__);
+
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(7484);
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(3228);
+// EXTERNAL MODULE: ./node_modules/node-fetch/lib/index.js
+var lib = __nccwpck_require__(6705);
+var lib_default = /*#__PURE__*/__nccwpck_require__.n(lib);
+;// CONCATENATED MODULE: ./src/main.ts
 
 
 
 async function run() {
     try {
-        const context = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context;
+        const context = github.context;
         const isIssue = !!context.payload.issue;
         if (!isIssue) {
             console.log('The event that triggered this action was not an issue, exiting');
@@ -36726,10 +36726,10 @@ async function run() {
             console.log('The issue is a feature request, exiting');
             return;
         }
-        const issueMessage = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('issue-message');
-        const repoToken = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('repo-token', { required: true });
+        const issueMessage = core.getInput('issue-message');
+        const repoToken = core.getInput('repo-token', { required: true });
         const issue = context.issue;
-        const client = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(repoToken, { request: { fetch: (node_fetch__WEBPACK_IMPORTED_MODULE_2___default()) } });
+        const client = github.getOctokit(repoToken, { request: { fetch: (lib_default()) } });
         await client.rest.issues.createComment({
             owner: issue.owner,
             repo: issue.repo,
@@ -36739,14 +36739,16 @@ async function run() {
     }
     catch (error) {
         if (error instanceof Error) {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
+            core.setFailed(error.message);
         }
         else {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(String(error));
+            core.setFailed(String(error));
         }
         return;
     }
 }
 
-var __webpack_exports__run = __webpack_exports__.e;
-export { __webpack_exports__run as run };
+;// CONCATENATED MODULE: ./src/index.ts
+
+run();
+
