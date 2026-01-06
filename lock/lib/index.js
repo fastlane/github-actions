@@ -36689,43 +36689,43 @@ module.exports = /*#__PURE__*/JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45
 /******/ 
 /************************************************************************/
 var __webpack_exports__ = {};
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   e: () => (/* binding */ run)
-/* harmony export */ });
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(7484);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(3228);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_fetch__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(6705);
-/* harmony import */ var node_fetch__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(node_fetch__WEBPACK_IMPORTED_MODULE_2__);
+
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(7484);
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(3228);
+// EXTERNAL MODULE: ./node_modules/node-fetch/lib/index.js
+var lib = __nccwpck_require__(6705);
+var lib_default = /*#__PURE__*/__nccwpck_require__.n(lib);
+;// CONCATENATED MODULE: ./src/main.ts
 
 
 
 async function run() {
     try {
         const args = getAndValidateArgs();
-        const client = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(args.repoToken, { request: { fetch: (node_fetch__WEBPACK_IMPORTED_MODULE_2___default()) } });
+        const client = github.getOctokit(args.repoToken, { request: { fetch: (lib_default()) } });
         await processIssues(client, args.daysBeforeLock, args.operationsPerRun);
     }
     catch (error) {
         if (error instanceof Error) {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.error(error);
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
+            core.error(error);
+            core.setFailed(error.message);
         }
         else {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.error(String(error));
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(String(error));
+            core.error(String(error));
+            core.setFailed(String(error));
         }
     }
 }
 function getAndValidateArgs() {
     const args = {
-        repoToken: _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('repo-token', { required: true }),
-        daysBeforeLock: parseInt(_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('days-before-lock', { required: true })),
-        operationsPerRun: parseInt(_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('operations-per-run', { required: true }))
+        repoToken: core.getInput('repo-token', { required: true }),
+        daysBeforeLock: parseInt(core.getInput('days-before-lock', { required: true })),
+        operationsPerRun: parseInt(core.getInput('operations-per-run', { required: true }))
     };
     for (const numberInput of ['days-before-lock', 'operations-per-run']) {
-        if (isNaN(parseInt(_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput(numberInput)))) {
+        if (isNaN(parseInt(core.getInput(numberInput)))) {
             throw Error(`input ${numberInput} did not parse to a valid integer`);
         }
     }
@@ -36733,8 +36733,8 @@ function getAndValidateArgs() {
 }
 async function processIssues(client, daysBeforeLock, operationsLeft, page = 1) {
     const issues = await client.rest.issues.listForRepo({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
         state: 'closed',
         per_page: 100,
         page: page
@@ -36744,7 +36744,7 @@ async function processIssues(client, daysBeforeLock, operationsLeft, page = 1) {
         return operationsLeft;
     }
     for (const issue of issues.data.values()) {
-        _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Found issue: "${issue.title}", last updated ${issue.updated_at}`);
+        core.debug(`Found issue: "${issue.title}", last updated ${issue.updated_at}`);
         if (wasLastUpdatedBefore(issue, daysBeforeLock) && !issue.locked) {
             operationsLeft -= await lock(client, issue);
         }
@@ -36760,15 +36760,17 @@ function wasLastUpdatedBefore(issue, days) {
     return millisSinceLastUpdated >= daysInMillis;
 }
 async function lock(client, issue) {
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Locking issue "${issue.title}"`);
+    core.debug(`Locking issue "${issue.title}"`);
     await client.rest.issues.lock({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
         issue_number: issue.number,
         headers: { 'Content-Length': 0 } // if you choose not to pass any parameters, you'll need to set Content-Length to zero when calling out to this endpoint. For more info see https://developer.github.com/v3/#http-verbs
     });
     return 1; // the number of API operations performed
 }
 
-var __webpack_exports__run = __webpack_exports__.e;
-export { __webpack_exports__run as run };
+;// CONCATENATED MODULE: ./src/index.ts
+
+run();
+
