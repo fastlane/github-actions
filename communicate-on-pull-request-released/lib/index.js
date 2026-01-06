@@ -36690,11 +36690,6 @@ module.exports = /*#__PURE__*/JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45
 /************************************************************************/
 var __webpack_exports__ = {};
 
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  e: () => (/* binding */ run)
-});
-
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(7484);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
@@ -36925,5 +36920,7 @@ async function resolveReleaseByVersion(client, version) {
 }
 run();
 
-var __webpack_exports__run = __webpack_exports__.e;
-export { __webpack_exports__run as run };
+;// CONCATENATED MODULE: ./src/index.ts
+
+run();
+
