@@ -5,7 +5,7 @@
   "type": "module",
   "description": "An action for adding a comment to include `fastlane env` in an issue description",
   "scripts": {
-    "build": "ncc build src/main.ts --license licenses.txt -o lib",
+    "build": "ncc build src/index.ts --license licenses.txt -o lib",
     "format": "prettier --write **/*.ts",
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 jest"
   },
