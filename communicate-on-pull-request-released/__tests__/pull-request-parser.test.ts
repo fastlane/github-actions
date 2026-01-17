@@ -63,6 +63,12 @@ describe('pull request parser test suite', () => {
       repo: 'bar'
     },
     {
+      prBody: 'fixes: #15',
+      issueNumber: 15,
+      owner: 'foo',
+      repo: 'bar'
+    },
+    {
       prBody: 'Fixes #456 and closes #456',
       issueNumber: 456,
       owner: 'foo',
