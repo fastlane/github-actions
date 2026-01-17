@@ -36712,30 +36712,35 @@ let ISSUE_CLOSING_KEYWORDS = [
 ];
 function getReferencedIssue(owner, repo, prBody) {
     if (!prBody || prBody.trim() === '') {
-        return undefined;
+        return [];
     }
+    let issueNumbers = [];
     // Searching for issue closing keywords and issue identifier in pull request's description,
     // i.e. `fixes #1234`, `close #444`, `resolved #1`
-    let regex = new RegExp(`(${ISSUE_CLOSING_KEYWORDS.join('|')}) #\\d{1,}`, 'i');
+    let regex = new RegExp(`(${ISSUE_CLOSING_KEYWORDS.join('|')}) #\\d{1,}`, 'gi');
     let matched = prBody.match(regex);
     if (matched && matched.length > 0) {
-        const issueMatch = matched[0].match(/#\d{1,}/i);
-        if (issueMatch && issueMatch.length > 0) {
-            const issueNumber = issueMatch[0].replace('#', '');
-            return Number(issueNumber);
-        }
+        matched.forEach(match => {
+            const issueMatch = match.match(/#\d{1,}/i);
+            if (issueMatch && issueMatch.length > 0) {
+                const issueNumber = issueMatch[0].replace('#', '');
+                issueNumbers.push(Number(issueNumber));
+            }
+        });
     }
     // Searching for issue closing keywords and issue URL in pull request's description,
     // i.e. `closes https://github.com/REPOSITORY_OWNER/REPOSITORY_NAME/issues/1234`
-    regex = new RegExp(`(${ISSUE_CLOSING_KEYWORDS.join('|')}) https:\\/\\/github.com\\/${owner}\\/${repo}\\/issues\\/\\d{1,}`, 'i');
+    regex = new RegExp(`(${ISSUE_CLOSING_KEYWORDS.join('|')}) https:\\/\\/github.com\\/${owner}\\/${repo}\\/issues\\/\\d{1,}`, 'gi');
     matched = prBody.match(regex);
     if (matched && matched.length > 0) {
-        const issue = matched[0].split('/').pop();
-        if (issue) {
-            return Number(issue);
-        }
+        matched.forEach(match => {
+            const issue = match.split('/').pop();
+            if (issue) {
+                issueNumbers.push(Number(issue));
+            }
+        });
     }
-    return undefined;
+    return [...new Set(issueNumbers)];
 }
 
 ;// CONCATENATED MODULE: ./src/release-parser.ts
@@ -36827,8 +36832,8 @@ async function addCommentToReferencedIssue(client, prNumber, release) {
     try {
         const pullRequest = await getPullRequest(client, prNumber);
         if (pullRequest.body) {
-            const issueNumber = getReferencedIssue(github.context.repo.owner, github.context.repo.repo, pullRequest.body);
-            if (issueNumber) {
+            const issueNumbers = getReferencedIssue(github.context.repo.owner, github.context.repo.repo, pullRequest.body);
+            for (const issueNumber of issueNumbers) {
                 const message = [
                     `The pull request #${prNumber} that closed this issue was merged and released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`,
                     `Please let us know if the functionality works as expected as a reply here. If it does not, please open a new issue. Thanks!`
