@@ -63,8 +63,8 @@ describe('pull request parser test suite', () => {
       repo: 'bar'
     },
     {
-      prBody: 'fixes: #15',
-      issueNumber: 15,
+      prBody: 'Fixes #456 and closes #456',
+      issueNumber: 456,
       owner: 'foo',
       repo: 'bar'
     }
@@ -120,13 +120,13 @@ describe('pull request parser test suite', () => {
 
   for (const scenario of validScenarios) {
     it(`It detects referenced issue for (${scenario.prBody})`, async () => {
-      expect(getReferencedIssue(scenario.owner, scenario.repo, scenario.prBody)).toEqual(scenario.issueNumber);
+      expect(getReferencedIssue(scenario.owner, scenario.repo, scenario.prBody)).toEqual([scenario.issueNumber]);
     });
   }
 
   for (const scenario of invalidScenarios) {
     it(`It does not detect referenced issue for (${scenario.prBody})`, async () => {
-      expect(getReferencedIssue(scenario.owner, scenario.repo, scenario.prBody)).toBeUndefined();
+      expect(getReferencedIssue(scenario.owner, scenario.repo, scenario.prBody)).toEqual([]);
     });
   }
 });

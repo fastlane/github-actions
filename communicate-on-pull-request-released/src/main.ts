@@ -78,12 +78,12 @@ async function addCommentToReferencedIssue(client: Octokit, prNumber: number, re
   try {
     const pullRequest = await getPullRequest(client, prNumber);
     if (pullRequest.body) {
-      const issueNumber = pullRequestParser.getReferencedIssue(
+      const issueNumbers = pullRequestParser.getReferencedIssue(
         github.context.repo.owner,
         github.context.repo.repo,
         pullRequest.body
       );
-      if (issueNumber) {
+      for (const issueNumber of issueNumbers) {
         const message = [
           `The pull request #${prNumber} that closed this issue was merged and released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`,
           `Please let us know if the functionality works as expected as a reply here. If it does not, please open a new issue. Thanks!`
