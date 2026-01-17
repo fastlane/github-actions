@@ -11,9 +11,11 @@ inputs:
   pr-label-to-add:
     description: 'The label to apply when a pull request is released'
     default: 'status: released'
+    required: false
   pr-label-to-remove:
     description: 'The label to remove when a pull request is released'
     default: 'status: included-in-next-release'
+    required: false
 runs:
   using: 'node24'
   main: 'lib/index.js'
