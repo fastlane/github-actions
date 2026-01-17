@@ -36797,11 +36797,16 @@ async function run() {
         for (const prNumber of prNumbers) {
             await addCommentToPullRequest(client, prNumber, `Congratulations! :tada: This was released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`);
             const labelToRemove = core.getInput('pr-label-to-remove');
-            const canRemoveLabel = await canRemoveLabelFromIssue(client, prNumber, labelToRemove);
-            if (canRemoveLabel) {
-                await removeLabel(client, prNumber, labelToRemove);
+            if (labelToRemove) {
+                const canRemoveLabel = await canRemoveLabelFromIssue(client, prNumber, labelToRemove);
+                if (canRemoveLabel) {
+                    await removeLabel(client, prNumber, labelToRemove);
+                }
             }
-            await addLabels(client, prNumber, [core.getInput('pr-label-to-add')]);
+            const labelToAdd = core.getInput('pr-label-to-add');
+            if (labelToAdd) {
+                await addLabels(client, prNumber, [labelToAdd]);
+            }
             await addCommentToReferencedIssue(client, prNumber, release);
         }
     }
