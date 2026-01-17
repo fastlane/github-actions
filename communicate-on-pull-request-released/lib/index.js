@@ -36810,25 +36810,35 @@ async function run() {
     }
 }
 async function addCommentToPullRequest(client, prNumber, comment) {
-    await client.rest.pulls.createReview({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        pull_number: prNumber,
-        body: comment,
-        event: 'COMMENT'
-    });
+    try {
+        await client.rest.pulls.createReview({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            pull_number: prNumber,
+            body: comment,
+            event: 'COMMENT'
+        });
+    }
+    catch (error) {
+        console.log(`Failed to add comment to pull request #${prNumber}: ${error instanceof Error ? error.message : error}`);
+    }
 }
 async function addCommentToReferencedIssue(client, prNumber, release) {
-    const pullRequest = await getPullRequest(client, prNumber);
-    if (pullRequest.body) {
-        const issueNumber = getReferencedIssue(github.context.repo.owner, github.context.repo.repo, pullRequest.body);
-        if (issueNumber) {
-            const message = [
-                `The pull request #${prNumber} that closed this issue was merged and released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`,
-                `Please let us know if the functionality works as expected as a reply here. If it does not, please open a new issue. Thanks!`
-            ];
-            await addIssueComment(client, issueNumber, message.join('\n'));
+    try {
+        const pullRequest = await getPullRequest(client, prNumber);
+        if (pullRequest.body) {
+            const issueNumber = getReferencedIssue(github.context.repo.owner, github.context.repo.repo, pullRequest.body);
+            if (issueNumber) {
+                const message = [
+                    `The pull request #${prNumber} that closed this issue was merged and released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`,
+                    `Please let us know if the functionality works as expected as a reply here. If it does not, please open a new issue. Thanks!`
+                ];
+                await addIssueComment(client, issueNumber, message.join('\n'));
+            }
         }
+    }
+    catch (error) {
+        console.log(`Failed to add comment to referenced issue for PR #${prNumber}: ${error instanceof Error ? error.message : error}`);
     }
 }
 async function getPullRequest(client, prNumber) {
@@ -36840,34 +36850,49 @@ async function getPullRequest(client, prNumber) {
     return response.data;
 }
 async function canRemoveLabelFromIssue(client, prNumber, label) {
-    const response = await client.rest.issues.listLabelsOnIssue({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        issue_number: prNumber
-    });
-    const issueLabels = response.data;
-    for (const issueLabel of issueLabels) {
-        if (issueLabel.name === label) {
-            return true;
+    try {
+        const response = await client.rest.issues.listLabelsOnIssue({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            issue_number: prNumber
+        });
+        const issueLabels = response.data;
+        for (const issueLabel of issueLabels) {
+            if (issueLabel.name === label) {
+                return true;
+            }
         }
+    }
+    catch (error) {
+        console.log(`Failed to list labels on issue #${prNumber}: ${error instanceof Error ? error.message : error}`);
     }
     return false;
 }
 async function addLabels(client, prNumber, labels) {
-    await client.rest.issues.addLabels({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        issue_number: prNumber,
-        labels: labels
-    });
+    try {
+        await client.rest.issues.addLabels({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            issue_number: prNumber,
+            labels: labels
+        });
+    }
+    catch (error) {
+        console.log(`Failed to add labels to PR #${prNumber}: ${error instanceof Error ? error.message : error}`);
+    }
 }
 async function removeLabel(client, prNumber, label) {
-    await client.rest.issues.removeLabel({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        issue_number: prNumber,
-        name: label
-    });
+    try {
+        await client.rest.issues.removeLabel({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            issue_number: prNumber,
+            name: label
+        });
+    }
+    catch (error) {
+        console.log(`Failed to remove label '${label}' from PR #${prNumber}: ${error instanceof Error ? error.message : error}`);
+    }
 }
 async function addIssueComment(client, issueNumber, message) {
     await client.rest.issues.createComment({
