@@ -36722,11 +36722,16 @@ async function run() {
             return;
         }
         const labelToRemove = core.getInput('pr-label-to-remove');
-        const canRemoveLabel = await canRemoveLabelFromIssue(client, prNumber, labelToRemove);
-        if (canRemoveLabel) {
-            await removeLabel(client, prNumber, labelToRemove);
+        if (labelToRemove) {
+            const canRemoveLabel = await canRemoveLabelFromIssue(client, prNumber, labelToRemove);
+            if (canRemoveLabel) {
+                await removeLabel(client, prNumber, labelToRemove);
+            }
         }
-        await addLabels(client, prNumber, [core.getInput('pr-label-to-add')]);
+        const labelToAdd = core.getInput('pr-label-to-add');
+        if (labelToAdd) {
+            await addLabels(client, prNumber, [labelToAdd]);
+        }
         await addComment(client, prNumber, core.getInput('pr-comment', { required: true }));
     }
     catch (error) {

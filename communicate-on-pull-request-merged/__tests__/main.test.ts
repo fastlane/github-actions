@@ -48,6 +48,32 @@ describe('action test suite', () => {
 
       expect(api.isDone()).toBeTruthy();
     });
+
+    it(`It does not crash when labels are empty for (${scenario.response})`, async () => {
+      process.env['INPUT_REPO-TOKEN'] = 'token';
+      process.env['INPUT_PR-COMMENT'] = 'message';
+      process.env['INPUT_PR-LABEL-TO-ADD'] = '';
+      process.env['INPUT_PR-LABEL-TO-REMOVE'] = '';
+
+      process.env['GITHUB_REPOSITORY'] = 'foo/bar';
+      process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, scenario.response);
+
+      const {run} = await import('../src/main.js');
+
+      const api = nock('https://api.github.com')
+        .post('/repos/foo/bar/pulls/10/reviews', '{"body":"message","event":"COMMENT"}')
+        .reply(200);
+
+      // These should NOT be called
+      const labelsGet = nock('https://api.github.com').get('/repos/foo/bar/issues/10/labels').reply(200, []);
+      const labelsPost = nock('https://api.github.com').post('/repos/foo/bar/issues/10/labels').reply(200);
+
+      await run();
+
+      expect(api.isDone()).toBeTruthy();
+      expect(labelsGet.isDone()).toBeFalsy();
+      expect(labelsPost.isDone()).toBeFalsy();
+    });
   }
 
   for (const scenario of invalidScenarios) {
