@@ -36953,7 +36953,6 @@ async function resolveReleaseByVersion(client, version) {
         return undefined;
     }
 }
-run();
 
 ;// CONCATENATED MODULE: ./src/index.ts
 

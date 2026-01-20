@@ -215,5 +215,3 @@ async function resolveReleaseByVersion(client: Octokit, version: string): Promis
     return undefined;
   }
 }
-
-run();
