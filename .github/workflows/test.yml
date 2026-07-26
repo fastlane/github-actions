@@ -18,7 +18,7 @@ jobs:
         node-version: [24]
     steps:
     - uses: actions/checkout@v7
-    - uses: actions/setup-node@v6
+    - uses: actions/setup-node@v7
       with:
         node-version: ${{ matrix.node-version }}
     - name: Run tests
@@ -36,7 +36,7 @@ jobs:
         node-version: [24]
     steps:
     - uses: actions/checkout@v7
-    - uses: actions/setup-node@v6
+    - uses: actions/setup-node@v7
       with:
         node-version: ${{ matrix.node-version }}
     - name: Run tests
@@ -54,7 +54,7 @@ jobs:
         node-version: [24]
     steps:
     - uses: actions/checkout@v7
-    - uses: actions/setup-node@v6
+    - uses: actions/setup-node@v7
       with:
         node-version: ${{ matrix.node-version }}
     - name: Run tests
@@ -72,7 +72,7 @@ jobs:
         node-version: [24]
     steps:
     - uses: actions/checkout@v7
-    - uses: actions/setup-node@v6
+    - uses: actions/setup-node@v7
       with:
         node-version: ${{ matrix.node-version }}
     - name: Run tests
