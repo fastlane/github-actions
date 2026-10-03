@@ -8,5 +8,5 @@
   "bracketSpacing": false,
   "arrowParens": "avoid",
   "sortPackageJson": false,
-  "ignorePatterns": ["lib", "coverage", "__tests__/**/*.json"]
+  "ignorePatterns": ["lib", "coverage", "__tests__/**/*.json", "**/*.md", "**/*.yml"]
 }

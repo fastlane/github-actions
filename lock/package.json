@@ -6,8 +6,8 @@
   "description": "An action for locking closed issues and pull requests",
   "scripts": {
     "build": "ncc build src/index.ts --license licenses.txt -o lib",
-    "format": "oxfmt -c .oxfmtrc.json src __tests__",
-    "format:check": "npm run format -- --check",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 jest"
   },
   "keywords": [
