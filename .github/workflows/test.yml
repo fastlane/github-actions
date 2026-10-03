@@ -25,6 +25,7 @@ jobs:
       run: |
         cd communicate-on-pull-request-merged
         npm ci
+        npm run fmt:check
         npm run build
         npm test
 
@@ -43,6 +44,7 @@ jobs:
       run: |
         cd communicate-on-pull-request-released
         npm ci
+        npm run fmt:check
         npm run build
         npm test
 
@@ -61,6 +63,7 @@ jobs:
       run: |
         cd fastlane-env-reminder
         npm ci
+        npm run fmt:check
         npm run build
         npm test
 
@@ -79,5 +82,6 @@ jobs:
       run: |
         cd lock
         npm ci
+        npm run fmt:check
         npm run build
         npm test

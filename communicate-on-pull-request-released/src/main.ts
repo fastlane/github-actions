@@ -75,7 +75,9 @@ async function addCommentToPullRequest(client: Octokit, prNumber: number, commen
       event: 'COMMENT'
     });
   } catch (error) {
-    console.log(`Failed to add comment to pull request #${prNumber}: ${error instanceof Error ? error.message : error}`);
+    console.log(
+      `Failed to add comment to pull request #${prNumber}: ${error instanceof Error ? error.message : error}`
+    );
   }
 }
 
@@ -154,7 +156,9 @@ async function removeLabel(client: Octokit, prNumber: number, label: string) {
       name: label
     });
   } catch (error) {
-    console.log(`Failed to remove label '${label}' from PR #${prNumber}: ${error instanceof Error ? error.message : error}`);
+    console.log(
+      `Failed to remove label '${label}' from PR #${prNumber}: ${error instanceof Error ? error.message : error}`
+    );
   }
 }
 

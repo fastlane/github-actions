@@ -7,5 +7,6 @@
   "trailingComma": "none",
   "bracketSpacing": false,
   "arrowParens": "avoid",
-  "parser": "typescript"
+  "sortPackageJson": false,
+  "ignorePatterns": ["lib", "coverage", "__tests__/**/*.json", "**/*.md", "**/*.yml"]
 }
