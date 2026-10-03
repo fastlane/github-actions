@@ -7,7 +7,7 @@
   "scripts": {
     "build": "ncc build src/index.ts --license licenses.txt -o lib",
     "format": "oxfmt -c .oxfmtrc.json src __tests__",
-    "format:check": "oxfmt -c .oxfmtrc.json --check src __tests__",
+    "format:check": "npm run format -- --check",
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 jest"
   },
   "keywords": [
