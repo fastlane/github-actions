@@ -6,7 +6,8 @@
   "description": "An action for adding comments and labels to a pull request and referenced issue when the pull request is released",
   "scripts": {
     "build": "ncc build src/index.ts --license licenses.txt -o lib",
-    "format": "prettier --write **/*.ts",
+    "format": "oxfmt src __tests__",
+    "format:check": "oxfmt --check src __tests__",
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 jest"
   },
   "keywords": [
@@ -31,7 +32,7 @@
     "@vercel/ncc": "^0.38.1",
     "jest": "^30.2.0",
     "nock": "^13.5.6",
-    "prettier": "^3.7.4",
+    "oxfmt": "^0.71.0",
     "ts-jest": "^29.4.6",
     "ts-jest-resolver": "^2.0.1",
     "typescript": "^5.9.3"
