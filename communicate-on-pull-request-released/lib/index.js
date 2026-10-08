@@ -40496,6 +40496,8 @@ var node_fetch_lib_default = /*#__PURE__*/__nccwpck_require__.n(node_fetch_lib);
 
 
 
+// GitHub recommends at least 1s between content-creating requests to avoid secondary rate limits.
+const DEFAULT_DELAY_MS = 1000;
 async function run() {
     try {
         const repoToken = core.getInput('repo-token', { required: true });
@@ -40514,8 +40516,14 @@ async function run() {
             core.setFailed(`No release found matching name '${versionInput} Improvements' and no usable payload available, exiting`);
             return;
         }
+        const delayMs = parseDelay(core.getInput('delay-ms', { required: false }));
         const prNumbers = getReferencedPullRequests(release.body);
-        for (const prNumber of prNumbers) {
+        console.log(`Found ${prNumbers.length} pull request(s) in release ${release.tag} (delay: ${delayMs}ms)`);
+        for (const [index, prNumber] of prNumbers.entries()) {
+            if (index > 0) {
+                await sleep(delayMs);
+            }
+            console.log(`[${index + 1}/${prNumbers.length}] Processing PR #${prNumber}`);
             await addCommentToPullRequest(client, prNumber, `Congratulations! :tada: This was released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`);
             const labelToRemove = core.getInput('pr-label-to-remove');
             if (labelToRemove) {
@@ -40528,8 +40536,9 @@ async function run() {
             if (labelToAdd) {
                 await addLabels(client, prNumber, [labelToAdd]);
             }
-            await addCommentToReferencedIssue(client, prNumber, release);
+            await addCommentToReferencedIssue(client, prNumber, release, delayMs);
         }
+        console.log(`Finished processing ${prNumbers.length} pull request(s)`);
     }
     catch (error) {
         if (error instanceof Error) {
@@ -40554,7 +40563,7 @@ async function addCommentToPullRequest(client, prNumber, comment) {
         console.log(`Failed to add comment to pull request #${prNumber}: ${error instanceof Error ? error.message : error}`);
     }
 }
-async function addCommentToReferencedIssue(client, prNumber, release) {
+async function addCommentToReferencedIssue(client, prNumber, release, delayMs) {
     try {
         const pullRequest = await getPullRequest(client, prNumber);
         if (pullRequest.body) {
@@ -40564,6 +40573,8 @@ async function addCommentToReferencedIssue(client, prNumber, release) {
                     `The pull request #${prNumber} that closed this issue was merged and released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`,
                     `Please let us know if the functionality works as expected as a reply here. If it does not, please open a new issue. Thanks!`
                 ];
+                await sleep(delayMs);
+                console.log(`  Commenting on issue #${issueNumber} (referenced by PR #${prNumber})`);
                 await addIssueComment(client, issueNumber, message.join('\n'));
             }
         }
@@ -40673,6 +40684,13 @@ async function resolveReleaseByVersion(client, version) {
         console.log(`Failed to resolve release by version '${version}': ${e instanceof Error ? e.message : e}`);
         return undefined;
     }
+}
+function parseDelay(input) {
+    const value = Number(input);
+    return input && Number.isFinite(value) && value >= 0 ? value : DEFAULT_DELAY_MS;
+}
+function sleep(ms) {
+    return ms > 0 ? new Promise(resolve => setTimeout(resolve, ms)) : Promise.resolve();
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts
