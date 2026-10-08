@@ -6,6 +6,9 @@ import fetch from 'node-fetch';
 
 type Octokit = ReturnType<typeof github.getOctokit>;
 
+// GitHub recommends at least 1s between content-creating requests to avoid secondary rate limits.
+const DEFAULT_DELAY_MS = 1000;
+
 interface Release {
   tag: string;
   body: string;
@@ -36,8 +39,14 @@ export async function run() {
       return;
     }
 
+    const delayMs = parseDelay(core.getInput('delay-ms', {required: false}));
     const prNumbers = releaseParser.getReferencedPullRequests(release.body);
-    for (const prNumber of prNumbers) {
+    console.log(`Found ${prNumbers.length} pull request(s) in release ${release.tag} (delay: ${delayMs}ms)`);
+    for (const [index, prNumber] of prNumbers.entries()) {
+      if (index > 0) {
+        await sleep(delayMs);
+      }
+      console.log(`[${index + 1}/${prNumbers.length}] Processing PR #${prNumber}`);
       await addCommentToPullRequest(
         client,
         prNumber,
@@ -54,8 +63,9 @@ export async function run() {
       if (labelToAdd) {
         await addLabels(client, prNumber, [labelToAdd]);
       }
-      await addCommentToReferencedIssue(client, prNumber, release);
+      await addCommentToReferencedIssue(client, prNumber, release, delayMs);
     }
+    console.log(`Finished processing ${prNumbers.length} pull request(s)`);
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message);
@@ -81,7 +91,7 @@ async function addCommentToPullRequest(client: Octokit, prNumber: number, commen
   }
 }
 
-async function addCommentToReferencedIssue(client: Octokit, prNumber: number, release: Release) {
+async function addCommentToReferencedIssue(client: Octokit, prNumber: number, release: Release, delayMs: number) {
   try {
     const pullRequest = await getPullRequest(client, prNumber);
     if (pullRequest.body) {
@@ -95,6 +105,8 @@ async function addCommentToReferencedIssue(client: Octokit, prNumber: number, re
           `The pull request #${prNumber} that closed this issue was merged and released as part of [_fastlane_ ${release.tag}](${release.htmlURL}) :rocket:`,
           `Please let us know if the functionality works as expected as a reply here. If it does not, please open a new issue. Thanks!`
         ];
+        await sleep(delayMs);
+        console.log(`  Commenting on issue #${issueNumber} (referenced by PR #${prNumber})`);
         await addIssueComment(client, issueNumber, message.join('\n'));
       }
     }
@@ -218,4 +230,13 @@ async function resolveReleaseByVersion(client: Octokit, version: string): Promis
     console.log(`Failed to resolve release by version '${version}': ${e instanceof Error ? e.message : e}`);
     return undefined;
   }
+}
+
+function parseDelay(input: string): number {
+  const value = Number(input);
+  return input && Number.isFinite(value) && value >= 0 ? value : DEFAULT_DELAY_MS;
+}
+
+function sleep(ms: number): Promise<void> {
+  return ms > 0 ? new Promise(resolve => setTimeout(resolve, ms)) : Promise.resolve();
 }

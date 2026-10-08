@@ -16,6 +16,7 @@ describe('action test suite', () => {
   for (const scenario of validScenarios) {
     it(`It posts a comment on pull requests, referenced issues and update labels for (${scenario.response})`, async () => {
       process.env['INPUT_REPO-TOKEN'] = 'token';
+      process.env['INPUT_DELAY-MS'] = '0';
       process.env['INPUT_PR-LABEL-TO-ADD'] = 'label-to-add';
       process.env['INPUT_PR-LABEL-TO-REMOVE'] = 'label-to-remove';
 
@@ -51,6 +52,7 @@ describe('action test suite', () => {
 
     it(`It does not crash when labels are empty for (${scenario.response})`, async () => {
       process.env['INPUT_REPO-TOKEN'] = 'token';
+      process.env['INPUT_DELAY-MS'] = '0';
       process.env['INPUT_PR-LABEL-TO-ADD'] = '';
       process.env['INPUT_PR-LABEL-TO-REMOVE'] = '';
 
@@ -99,6 +101,7 @@ describe('action test suite', () => {
   for (const scenario of invalidScenarios) {
     it(`It does not post a comment on pull requests, referenced issues and does not update labels for (${scenario.response})`, async () => {
       process.env['INPUT_REPO-TOKEN'] = 'token';
+      process.env['INPUT_DELAY-MS'] = '0';
       process.env['INPUT_PR-LABEL-TO-ADD'] = 'label-to-add';
       process.env['INPUT_PR-LABEL-TO-REMOVE'] = 'label-to-remove';
 
