@@ -1,0 +1,12 @@
+{
+    "pull_request": {
+        "number": 10,
+        "body": "Bumps a dependency.",
+        "merged": true,
+        "user": {
+            "login": "dependabot[bot]",
+            "type": "Bot"
+        }
+    },
+    "action": "closed"
+}
