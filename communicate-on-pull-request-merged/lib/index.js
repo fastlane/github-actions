@@ -40453,6 +40453,12 @@ async function run() {
         if (labelToAdd) {
             await addLabels(client, prNumber, [labelToAdd]);
         }
+        const skipCommentForBots = core.getInput('skip-comment-for-bots').toLowerCase() !== 'false';
+        const author = context.payload.pull_request.user;
+        if (skipCommentForBots && author?.type === 'Bot') {
+            console.log(`Pull request was authored by a bot (${author.login}), skipping comment`);
+            return;
+        }
         await addComment(client, prNumber, core.getInput('pr-comment', { required: true }));
     }
     catch (error) {
