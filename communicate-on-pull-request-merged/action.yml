@@ -16,6 +16,10 @@ inputs:
     description: 'The label to remove when a pull request is merged'
     default: 'status: needs-attention'
     required: false
+  skip-comment-for-bots:
+    description: 'Skip posting the comment when the pull request was authored by a bot (e.g. dependabot). Labels are still applied'
+    default: 'true'
+    required: false
 runs:
   using: node24
   main: lib/index.js

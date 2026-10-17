@@ -76,6 +76,53 @@ describe('action test suite', () => {
     });
   }
 
+  it('It applies labels but skips the comment for a bot-authored pull request', async () => {
+    process.env['INPUT_REPO-TOKEN'] = 'token';
+    process.env['INPUT_PR-COMMENT'] = 'message';
+    process.env['INPUT_PR-LABEL-TO-ADD'] = 'label-to-add';
+    process.env['INPUT_PR-LABEL-TO-REMOVE'] = 'label-to-remove';
+
+    process.env['GITHUB_REPOSITORY'] = 'foo/bar';
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'pull-request-closed-by-bot.json');
+
+    const {run} = await import('../src/main.js');
+
+    const api = nock('https://api.github.com')
+      .get('/repos/foo/bar/issues/10/labels')
+      .reply(200, JSON.parse('[]'))
+      .post('/repos/foo/bar/issues/10/labels', '{"labels":["label-to-add"]}')
+      .reply(200);
+
+    // This should NOT be called
+    const review = nock('https://api.github.com').post('/repos/foo/bar/pulls/10/reviews').reply(200);
+
+    await run();
+
+    expect(api.isDone()).toBeTruthy();
+    expect(review.isDone()).toBeFalsy();
+  });
+
+  it('It posts a comment for a bot-authored pull request when skip-comment-for-bots is false', async () => {
+    process.env['INPUT_REPO-TOKEN'] = 'token';
+    process.env['INPUT_PR-COMMENT'] = 'message';
+    process.env['INPUT_PR-LABEL-TO-ADD'] = '';
+    process.env['INPUT_PR-LABEL-TO-REMOVE'] = '';
+    process.env['INPUT_SKIP-COMMENT-FOR-BOTS'] = 'false';
+
+    process.env['GITHUB_REPOSITORY'] = 'foo/bar';
+    process.env['GITHUB_EVENT_PATH'] = path.join(__dirname, 'pull-request-closed-by-bot.json');
+
+    const {run} = await import('../src/main.js');
+
+    const api = nock('https://api.github.com')
+      .post('/repos/foo/bar/pulls/10/reviews', '{"body":"message","event":"COMMENT"}')
+      .reply(200);
+
+    await run();
+
+    expect(api.isDone()).toBeTruthy();
+  });
+
   for (const scenario of invalidScenarios) {
     it(`It does not post a comment on a closed pull request for (${scenario.response})`, async () => {
       process.env['INPUT_REPO-TOKEN'] = 'token';
