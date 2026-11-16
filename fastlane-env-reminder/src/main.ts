@@ -28,8 +28,9 @@ export async function run() {
       return;
     }
 
-    if (issueBody.includes('### Feature Request')) {
-      console.log('The issue is a feature request, exiting');
+    const authorAssociation = context.payload.issue!.author_association;
+    if (['OWNER', 'MEMBER', 'COLLABORATOR'].includes(authorAssociation)) {
+      console.log(`The issue was opened by a maintainer (${authorAssociation}), exiting`);
       return;
     }
 
