@@ -8,6 +8,9 @@ const __dirname = path.dirname(__filename);
 const validScenarios = [
   {
     response: 'issue.json'
+  },
+  {
+    response: 'issue-opened-by-contributor.json'
   }
 ];
 
@@ -25,7 +28,7 @@ const invalidScenarios = [
     response: 'issue-contains-fastlane-env.json'
   },
   {
-    response: 'issue-feature-request.json'
+    response: 'issue-opened-by-member.json'
   }
 ];
 
